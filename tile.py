@@ -9,7 +9,7 @@ class Tile:
         self.window = window
         self.width = 60
         self.height = 60
-        self.rect = pygame.Rect(x, y, self.width, self.height)
+        self.rect = pygame.Rect(y, x, self.width, self.height)
         self.background_color = "white"
         self.selected = False
         self.notes = []

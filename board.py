@@ -21,8 +21,8 @@ class Board:
         self.board = np.array(self.init_board)
         self.window = window.subsurface(pygame.Rect(340, 90, 540, 540))
         self.tiles = [
-            [Tile(j * 60, i * 60, self.board[i][j], self.window) for i in range(9)]
-            for j in range(9)
+            [Tile(i * 60, j * 60, self.board[i][j], self.window) for j in range(9)]
+            for i in range(9)
         ]
         self.note = True
 
@@ -40,7 +40,7 @@ class Board:
         x -= 340
         y -= 90
         if 0 <= x < 540 and 0 <= y < 540:
-            return self.tiles[x // 60][y // 60]
+            return self.tiles[y // 60][x // 60]
         return None
 
     def select_tile(self, tile: Tile):
@@ -66,12 +66,13 @@ class Board:
         for i in range(9):
             for j in range(9):
                 if self.tiles[i][j].selected and self.init_board[i][j] == 0:
-                    if self.note and nb > 0:
-                        self.tiles[i][j].value = 0
-                        if nb in self.tiles[i][j].notes:
-                            self.tiles[i][j].notes.remove(nb)
-                        else:
-                            self.tiles[i][j].notes.append(nb)
+                    if self.note:
+                        if nb > 0:
+                            self.tiles[i][j].value = 0
+                            if nb in self.tiles[i][j].notes:
+                                self.tiles[i][j].notes.remove(nb)
+                            else:
+                                self.tiles[i][j].notes.append(nb)
                     else:
                         self.tiles[i][j].notes.clear()
                         self.tiles[i][j].value = nb
