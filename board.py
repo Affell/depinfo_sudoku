@@ -80,5 +80,3 @@ class Board:
             for j in range(9):
                 if self.tiles[i][j].selected and self.init_board[i][j] == 0:
                     self.tiles[i][j].value = nb
-
-print("bon")
