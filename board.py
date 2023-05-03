@@ -21,35 +21,20 @@ class Board:
         self.board = np.array(self.init_board)
         self.window = window.subsurface(pygame.Rect(340, 90, 540, 540))
         self.tiles = [
-            [Tile(self.board[i][j], self.window, i * 60, j * 60) for i in range(9)]
-            for j in range(9)
+            [Tile(i * 60, j * 60, self.board[i][j], self.window) for j in range(9)]
+            for i in range(9)
         ]
+        self.note = True
 
     def draw_board(self):
         for i in range(9):
             for j in range(9):
                 self.tiles[i][j].draw()
                 self.tiles[i][j].display()
-                if j % 3 == 0 and j != 0:
-                    pygame.draw.line(
-                        self.window,
-                        (0, 0, 0),
-                        (((j // 3) * 180) + 1, 0),
-                        (((j // 3) * 180) + 1, 540),
-                        5,
-                    )
-
-                if i % 3 == 0 and i != 0:
-                    pygame.draw.line(
-                        self.window,
-                        (0, 0, 0),
-                        (0, ((i // 3) * 180) + 1),
-                        (540, ((i // 3) * 180) + 1),
-                        5,
-                    )
-
-        pygame.display.flip()
-        pygame.display.update()
+        for i in range(1, 4):
+            pygame.draw.line(self.window, (0, 0, 0), (i * 180, 0), (i * 180, 540), 5)
+        for j in range(1, 4):
+            pygame.draw.line(self.window, (0, 0, 0), (0, j * 180), (540, j * 180), 5)
 
     def get_tile(self, x, y) -> Tile:
         x -= 340
@@ -63,7 +48,9 @@ class Board:
         for i in range(9):
             for j in range(9):
                 self.tiles[i][j].selected = False
-                if self.tiles[i][j].value == tile.value:
+                if (self.tiles[i][j].value != 0 or (i, j) == pos) and self.tiles[i][
+                    j
+                ].value == tile.value:
                     self.tiles[i][j].background_color = "green"
                 elif (
                     i == pos[0]
@@ -79,6 +66,15 @@ class Board:
         for i in range(9):
             for j in range(9):
                 if self.tiles[i][j].selected and self.init_board[i][j] == 0:
-                    self.tiles[i][j].value = nb
-
-print("bon")
+                    if self.note:
+                        if nb > 0:
+                            self.tiles[i][j].value = 0
+                            if nb in self.tiles[i][j].notes:
+                                self.tiles[i][j].notes.remove(nb)
+                            else:
+                                self.tiles[i][j].notes.append(nb)
+                    else:
+                        self.tiles[i][j].notes.clear()
+                        self.tiles[i][j].value = nb
+                        self.select_tile(self.tiles[i][j])
+                    break

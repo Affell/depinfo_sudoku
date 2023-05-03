@@ -1,4 +1,5 @@
 from board import Board
+from button import Button
 import numpy as np
 import pygame
 
@@ -8,6 +9,12 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((1280, 720))
     board: Board = Board(screen, matrix)
+
+    def on_click():
+        board.note = not board.note
+
+    note_button: Button = Button(1000, 90, screen, 150, 150, "Note", on_click)
+
     clock = pygame.time.Clock()
     running = True
     while running:
@@ -26,6 +33,8 @@ def main():
 
         screen.fill("white")
         board.draw_board()
+        note_button.process(board)
+        pygame.display.flip()
 
         clock.tick(60)
 
