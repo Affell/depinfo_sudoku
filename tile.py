@@ -28,8 +28,8 @@ class Tile:
             font = pygame.font.SysFont("arial", 15)
             for i in range(len(self.notes)):
                 pos = (
-                    self.x + 10 + 20 * ((self.notes[i] - 1) % 3),
-                    self.y + 10 + 20 * ((self.notes[i] - 1) // 3),
+                    self.y + 10 + 20 * ((self.notes[i] - 1) % 3),
+                    self.x + 10 + 20 * ((self.notes[i] - 1) // 3),
                 )
                 text = font.render(str(self.notes[i]), True, (0, 0, 0))
                 self.window.blit(text, text.get_rect(center=pos))
