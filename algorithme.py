@@ -1,3 +1,5 @@
+import numpy as np
+
 grille1 = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
     [6, 0, 0, 0, 7, 5, 0, 0, 9],
@@ -88,12 +90,14 @@ def case_vide(grille):
 
 
 # Algo de backtracking pour résoudre une grille rentrée en paramètre
-
-
 def resoud_grille(grille):
+    return resoud_grille_(np.array(grille))[1]
+
+
+def resoud_grille_(grille):
     vide = case_vide(grille)
     if not vide:
-        return True
+        return True, grille
     else:
         row, col = vide
 
@@ -101,15 +105,9 @@ def resoud_grille(grille):
         if saisie_valide(grille, i, (row, col)):
             grille[row][col] = i
 
-            if resoud_grille(grille):
-                return True
+            if resoud_grille_(grille)[0]:
+                return True, grille
 
             grille[row][col] = 0
 
-    return False
-
-
-grille = lecture_grille()
-print(grille1)
-print(resoud_grille(grille1))
-print(grille1)
+    return False, None
