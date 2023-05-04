@@ -27,7 +27,7 @@ def lecture_grille():
         ligne_liste = [int(e) for e in elements]
         grille_jeu.append(ligne_liste)
 
-    return grille_jeu
+    return np.array(grille_jeu)
 
 
 # Vérifie de la validité de la grille(on peut ajouter d'autres vérifications)

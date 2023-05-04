@@ -4,27 +4,20 @@ from tile import Tile
 
 
 class Board:
-    def __init__(self, window: pygame.Surface, matrix):
-        self.init_board = np.array(
-            [
-                [5, 3, 0, 0, 7, 0, 0, 0, 0],
-                [6, 0, 0, 1, 9, 5, 0, 0, 0],
-                [0, 9, 8, 0, 0, 0, 0, 6, 0],
-                [8, 0, 0, 0, 6, 0, 0, 0, 3],
-                [4, 0, 0, 8, 0, 3, 0, 0, 1],
-                [7, 0, 0, 0, 2, 0, 0, 0, 6],
-                [0, 6, 0, 0, 0, 0, 2, 8, 0],
-                [0, 0, 0, 4, 1, 9, 0, 0, 5],
-                [0, 0, 0, 0, 8, 0, 0, 7, 9],
-            ]
-        )
+    def __init__(
+        self, screen: pygame.Surface, matrix: np.ndarray, solution: np.ndarray
+    ):
+        self.init_board = np.array(matrix)
         self.board = np.array(self.init_board)
-        self.window = window.subsurface(pygame.Rect(340, 90, 540, 540))
+        self.solution = np.array(solution)
+        self.window = screen.subsurface(pygame.Rect(340, 90, 540, 540))
         self.tiles = [
             [Tile(i * 60, j * 60, self.board[i][j], self.window) for j in range(9)]
             for i in range(9)
         ]
-        self.note = True
+        self.note = False
+        self.error_rect = screen.subsurface(pygame.Rect(950, 50, 200, 30))
+        self.error_count = 0
 
     def draw_board(self):
         for i in range(9):
@@ -35,6 +28,12 @@ class Board:
             pygame.draw.line(self.window, (0, 0, 0), (i * 180, 0), (i * 180, 540), 5)
         for j in range(1, 4):
             pygame.draw.line(self.window, (0, 0, 0), (0, j * 180), (540, j * 180), 5)
+
+        font = pygame.font.SysFont("arial", 20)
+        text = font.render(f"erreurs : {self.error_count}", True, "black")
+        self.error_rect.blit(
+            text, text.get_rect(center=self.error_rect.get_rect().center)
+        )
 
     def get_tile(self, x, y) -> Tile:
         x -= 340
@@ -76,5 +75,10 @@ class Board:
                     else:
                         self.tiles[i][j].notes.clear()
                         self.tiles[i][j].value = nb
+                        if self.solution[i][j] == nb:
+                            self.tiles[i][j].valid = True
+                        else:
+                            self.tiles[i][j].valid = False
+                            self.error_count += 1
                         self.select_tile(self.tiles[i][j])
                     break

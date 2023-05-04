@@ -12,6 +12,8 @@ class Tile:
         self.rect = pygame.Rect(y, x, self.width, self.height)
         self.background_color = "white"
         self.selected = False
+        self.init_value = value
+        self.valid = self.init_value != 0
         self.notes = []
 
     def draw(self):
@@ -22,7 +24,12 @@ class Tile:
     def display(self):
         if self.value != 0:
             font = pygame.font.SysFont("arial", 50)
-            text = font.render(str(self.value), True, (0, 0, 0))
+            color = "red"
+            if self.init_value == 0 and self.valid:
+                color = "blue"
+            elif self.init_value != 0:
+                color = "black"
+            text = font.render(str(self.value), True, color)
             self.window.blit(text, text.get_rect(center=self.rect.center))
         elif len(self.notes) > 0:
             font = pygame.font.SysFont("arial", 15)
