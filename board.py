@@ -15,15 +15,12 @@ class Board:
     ):
         self.name = name
         self.init_board = np.array(matrix)
-        self.board = np.array(progress)
         self.error_count = errors
         self.solution = np.array(solution)
         self.window = screen.subsurface(pygame.Rect(340, 90, 540, 540))
         self.tiles = [
             [
-                Tile(
-                    i * 60, j * 60, self.board[i][j], self.init_board[i][j], self.window
-                )
+                Tile(i * 60, j * 60, progress[i][j], self.init_board[i][j], self.window)
                 for j in range(9)
             ]
             for i in range(9)
@@ -93,10 +90,18 @@ class Board:
                             self.tiles[i][j].valid = False
                             self.error_count += 1 if nb != 0 else 0
                         self.select_tile(self.tiles[i][j])
+                        self.save()
                     break
 
     def save(self):
         with open(f"./grids/{self.name}.sudoku", "w") as f:
-            f.writelines([",".join([str(e) for e in line]) for line in self.init_board])
-            f.write(f"PROGRESS:{self.error_count}")
-            f.writelines([",".join([str(e) for e in line]) for line in self.board])
+            f.writelines(
+                [",".join([str(e) for e in line]) + "\n" for line in self.init_board]
+            )
+            f.write(f"PROGRESS:{self.error_count}\n")
+            f.writelines(
+                [
+                    ",".join([str(tile.value) for tile in line]) + "\n"
+                    for line in self.tiles
+                ]
+            )
