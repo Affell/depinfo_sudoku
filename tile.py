@@ -2,17 +2,17 @@ import pygame
 
 
 class Tile:
-    def __init__(self, x, y, value, window):
+    def __init__(self, x, y, value, init_value, window):
         self.x = x
         self.y = y
         self.value = value
+        self.init_value = init_value
         self.window = window
         self.width = 60
         self.height = 60
         self.rect = pygame.Rect(y, x, self.width, self.height)
         self.background_color = "white"
         self.selected = False
-        self.init_value = value
         self.valid = self.init_value != 0
         self.notes = []
 

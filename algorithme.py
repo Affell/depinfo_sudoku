@@ -16,39 +16,55 @@ grille1 = [
 # Lecture de la grille à partir du fichier
 
 
-def lecture_grille():
-    with open("grilles.sudoku", "r") as f:
+def lecture_grille(name):
+    with open(f"./grids/{name}.sudoku", "r") as f:
         lignes = f.readlines()
 
-    grille_jeu = []
+    init_grid = []
+    progress_grid = []
+    progress = False
+    errors = 0
     for ligne in lignes:
         ligne = ligne.strip()
-        elements = ligne.split(",")
-        ligne_liste = [int(e) for e in elements]
-        grille_jeu.append(ligne_liste)
+        if ligne.startswith("PROGRESS:"):
+            progress = True
+            try:
+                errors = int(ligne[9:])
+            except Exception:
+                continue
+        else:
+            elements = ligne.split(",")
+            ligne_liste = [int(e) for e in elements]
+            if progress:
+                progress_grid.append(ligne_liste)
+            else:
+                init_grid.append(ligne_liste)
 
-    return np.array(grille_jeu)
+    return (
+        np.array(init_grid),
+        np.array(progress_grid) if len(progress_grid) > 0 else np.array(init_grid),
+        errors,
+    )
 
 
 # Vérifie de la validité de la grille(on peut ajouter d'autres vérifications)
 
 
 def grille_valide(grille_jeu):
-    valide = False
     compteur = 0
     for i in range(len(grille_jeu)):
         for j in range(len(grille_jeu)):
             case = grille_jeu[i][j]
             if case > 0:
                 compteur += 1
-        if compteur >= 17:
-            valide = True
+    if compteur < 18:
+        return False
     for ligne in grille_jeu:
         liste = [e for e in ligne if e != 0]
         if len(set(liste)) != (len(liste)):
-            valide = False
+            return False
 
-    return valide
+    return True
 
 
 # Vérification de la validité de la saisie dans la grille (si il n'y a pas de contradiction avec les règles du Sudoku)
