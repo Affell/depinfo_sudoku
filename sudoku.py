@@ -7,12 +7,26 @@ import os
 import threading
 
 board: Board = None
+sizes = {"4x4": 4, "9x9": 9, "16x16": 16}
 difficulties = {
-    "Facile": 38,
-    "Moyen": 33,
-    "Difficile": 30,
-    "Expert": 28,
-    "Diabolique": 25,
+    "4x4": {
+        "Facile": 6,
+        "Moyen": 5,
+    },
+    "9x9": {
+        "Facile": 38,
+        "Moyen": 33,
+        "Difficile": 30,
+        "Expert": 28,
+        "Diabolique": 25,
+    },
+    "16x16": {
+        "Facile": 180,
+        "Moyen": 140,
+        "Difficile": 130,
+        "Expert": 120,
+        "Diabolique": 110,
+    },
 }
 
 
@@ -35,7 +49,7 @@ def menu_load_grid(name, screen):
         print(f'La grille "{name}" est invalide')
 
 
-def menu_generate_grid(name, difficulty, screen, menu):
+def menu_generate_grid(name, size, difficulty, screen, menu):
     if len(name.strip()) == 0:
         print("Nom de grille invalide")
         return
@@ -45,7 +59,7 @@ def menu_generate_grid(name, difficulty, screen, menu):
 
         def background_generation():
             grid, solution = algorithme.genere_grille(
-                difficulties[difficulty], progress_bar
+                difficulties[size][difficulty], sizes[size], progress_bar
             )
             global board
             board = Board(name, screen, grid, grid, [], False, 0, solution)
@@ -72,16 +86,28 @@ def build_menu(screen) -> pygame_menu.Menu:
     )
 
     for grid in list_grids():
-        load_menu.add.button(grid, lambda: menu_load_grid(grid, screen))
+        btn = load_menu.add.button(
+            grid, lambda name: menu_load_grid(name, screen), grid
+        )
 
     name_input = generate_menu.add.text_input("Nom : ")
+    size_selector = generate_menu.add.selector(
+        "Taille : ", [(s,) for s in sizes.keys()]
+    )
     difficulty_selector = generate_menu.add.selector(
-        "Difficulté : ", [(d,) for d in difficulties.keys()]
+        "Difficulté : ",
+        [(d,) for d in difficulties[size_selector.get_value()[0][0]].keys()],
+    )
+    size_selector.set_onchange(
+        lambda size: difficulty_selector.update_items(
+            [(d,) for d in difficulties[size[0][0]].keys()]
+        )
     )
     generate_menu.add.button(
         "Valider",
         lambda: menu_generate_grid(
             name_input.get_value(),
+            size_selector.get_value()[0][0],
             difficulty_selector.get_value()[0][0],
             screen,
             generate_menu,
@@ -129,7 +155,7 @@ def game_loop():
                 running = False
             elif board is not None and event.type == pygame.KEYDOWN:
                 try:
-                    board.enter_digit(int(event.unicode))
+                    board.enter_char(event.unicode.upper())
                 except ValueError as _:
                     pass
 
