@@ -9,6 +9,7 @@ class Button:
         window,
         width,
         height,
+        fontColor,
         buttonText="Button",
         onclickFunction=None,
         onePress=False,
@@ -31,6 +32,7 @@ class Button:
         self.buttonSurface = window.subsurface(self.buttonRect)
 
         self.font = pygame.font.SysFont("Arial", 40)
+        self.fontColor = fontColor
 
     def process(self, board):
         mousePos = pygame.mouse.get_pos()
@@ -46,7 +48,7 @@ class Button:
                     self.alreadyPressed = True
             else:
                 self.alreadyPressed = False
-        text = self.font.render(self.buttonText, True, "green" if board.note else "red")
+        text = self.font.render(self.buttonText, True, self.fontColor)
         self.window.blit(
             text,
             text.get_rect(center=self.buttonRect.center),

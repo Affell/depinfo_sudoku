@@ -10,6 +10,8 @@ class Board:
         screen: pygame.Surface,
         matrix: np.ndarray,
         progress: np.ndarray,
+        notes: np.ndarray,
+        noteMode,
         errors: int,
         solution: np.ndarray,
     ):
@@ -25,6 +27,7 @@ class Board:
                     j * 60,
                     progress[i][j],
                     self.init_board[i][j],
+                    notes[i][j] if len(notes) > 0 else [],
                     self.solution[i][j] == progress[i][j],
                     self.window,
                 )
@@ -32,7 +35,7 @@ class Board:
             ]
             for i in range(9)
         ]
-        self.note = False
+        self.noteMode = noteMode
         self.error_rect = screen.subsurface(pygame.Rect(950, 50, 200, 30))
 
     def draw_board(self):
@@ -81,7 +84,7 @@ class Board:
         for i in range(9):
             for j in range(9):
                 if self.tiles[i][j].selected and self.init_board[i][j] == 0:
-                    if self.note:
+                    if self.noteMode:
                         if nb > 0:
                             self.tiles[i][j].value = 0
                             if nb in self.tiles[i][j].notes:
@@ -97,7 +100,6 @@ class Board:
                             self.tiles[i][j].valid = False
                             self.error_count += 1 if nb != 0 else 0
                         self.select_tile(self.tiles[i][j])
-                        self.save()
                     break
 
     def save(self):
@@ -109,6 +111,16 @@ class Board:
             f.writelines(
                 [
                     ",".join([str(tile.value) for tile in line]) + "\n"
+                    for line in self.tiles
+                ]
+            )
+            f.write(f"NOTES:{self.noteMode}\n")
+            f.writelines(
+                [
+                    ",".join(
+                        ["|".join([str(note) for note in tile.notes]) for tile in line]
+                    )
+                    + "\n"
                     for line in self.tiles
                 ]
             )

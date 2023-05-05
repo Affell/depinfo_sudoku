@@ -23,27 +23,46 @@ def lecture_grille(name):
 
     init_grid = []
     progress_grid = []
+    notes = []
     progress = False
+    note = False
+    noteMode = False
     errors = 0
     for ligne in lignes:
         ligne = ligne.strip()
         if ligne.startswith("PROGRESS:"):
+            noteMode = False
             progress = True
             try:
                 errors = int(ligne[9:])
             except Exception:
                 continue
+        elif ligne.startswith("NOTES:"):
+            progress = False
+            note = True
+            try:
+                noteMode = bool(ligne[6:])
+            except Exception:
+                continue
         else:
             elements = ligne.split(",")
-            ligne_liste = [int(e) for e in elements]
-            if progress:
-                progress_grid.append(ligne_liste)
+            if note:
+                ligne_liste = [
+                    [int(n) for n in e.split("|") if n != ""] for e in elements
+                ]
+                notes.append(ligne_liste)
             else:
-                init_grid.append(ligne_liste)
+                ligne_liste = [int(e) for e in elements]
+                if progress:
+                    progress_grid.append(ligne_liste)
+                else:
+                    init_grid.append(ligne_liste)
 
     return (
         np.array(init_grid),
         np.array(progress_grid) if len(progress_grid) > 0 else np.array(init_grid),
+        notes,
+        noteMode,
         errors,
     )
 

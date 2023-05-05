@@ -2,11 +2,12 @@ import pygame
 
 
 class Tile:
-    def __init__(self, x, y, value, init_value, valid, window):
+    def __init__(self, x, y, value, init_value, notes, valid, window):
         self.x = x
         self.y = y
         self.value = value
         self.init_value = init_value
+        self.notes = notes
         self.valid = valid
         self.window = window
         self.width = 60
@@ -14,7 +15,6 @@ class Tile:
         self.rect = pygame.Rect(y, x, self.width, self.height)
         self.background_color = "white"
         self.selected = False
-        self.notes = []
 
     def draw(self):
         surface: pygame.Surface = self.window.subsurface(self.rect)

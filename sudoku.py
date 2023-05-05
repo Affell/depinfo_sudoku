@@ -21,12 +21,14 @@ def list_grids() -> list[str]:
 
 
 def menu_load_grid(name, screen):
-    grid, progress, errors = algorithme.lecture_grille(name)
+    grid, progress, notes, noteMode, errors = algorithme.lecture_grille(name)
     if algorithme.grille_valide(grid):
         solution = algorithme.resoud_grille(grid)
         if solution is not None:
             global board
-            board = Board(name, screen, grid, progress, errors, solution)
+            board = Board(
+                name, screen, grid, progress, notes, noteMode, errors, solution
+            )
         else:
             print(f'Aucune solution n\'a pu être trouvée pour la grille "{name}"')
     else:
@@ -46,7 +48,7 @@ def menu_generate_grid(name, difficulty, screen, menu):
                 difficulties[difficulty], progress_bar
             )
             global board
-            board = Board(name, screen, grid, grid, 0, solution)
+            board = Board(name, screen, grid, grid, [], False, 0, solution)
             board.save()
 
         t = threading.Thread(
@@ -100,10 +102,12 @@ def game_loop():
 
     menu: pygame_menu.Menu = build_menu(screen)
 
-    def on_click():
-        board.note = not board.note
+    note_button: Button = Button(1000, 90, screen, 150, 150, "red", "Note")
 
-    note_button: Button = Button(1000, 90, screen, 150, 150, "Note", on_click)
+    def on_click():
+        board.noteMode = not board.noteMode
+
+    note_button.onclickFunction = on_click
 
     running = True
     while running:
@@ -111,6 +115,8 @@ def game_loop():
 
         for event in events:
             if event.type == pygame.QUIT:
+                if board is not None:
+                    board.save()
                 running = False
             elif board is not None and event.type == pygame.KEYDOWN:
                 try:
@@ -129,6 +135,7 @@ def game_loop():
 
             screen.fill("white")
             board.draw_board()
+            note_button.fontColor = "green" if board.noteMode else "red"
             note_button.process(board)
 
         pygame.display.flip()
