@@ -13,6 +13,7 @@ class Button:
         buttonText="Button",
         onclickFunction=None,
         onePress=False,
+        image=False,
     ):
         self.x = x
         self.y = y
@@ -33,8 +34,9 @@ class Button:
 
         self.font = pygame.font.SysFont("Arial", 40)
         self.fontColor = fontColor
+        self.image = pygame.image.load(image)
 
-    def process(self, board):
+    def process(self):
         mousePos = pygame.mouse.get_pos()
         self.buttonSurface.fill(self.fillColors["normal"])
         if self.buttonRect.collidepoint(mousePos):
@@ -51,5 +53,8 @@ class Button:
         text = self.font.render(self.buttonText, True, self.fontColor)
         self.window.blit(
             text,
-            text.get_rect(center=self.buttonRect.center),
+            text.get_rect(
+                center=(self.buttonRect.center[0], self.y + self.height - 20)
+            ),
         )
+        self.window.blit(self.image, (self.buttonRect.center[0] - 32, self.y))

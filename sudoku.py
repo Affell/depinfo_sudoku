@@ -102,7 +102,16 @@ def game_loop():
 
     menu: pygame_menu.Menu = build_menu(screen)
 
-    note_button: Button = Button(1000, 90, screen, 150, 150, "red", "Note")
+    note_button: Button = Button(
+        1000,
+        90,
+        screen,
+        100,
+        100,
+        "red",
+        buttonText="Note",
+        image="./resources/note-button.png",
+    )
 
     def on_click():
         board.noteMode = not board.noteMode
@@ -136,7 +145,7 @@ def game_loop():
             screen.fill("white")
             board.draw_board()
             note_button.fontColor = "green" if board.noteMode else "red"
-            note_button.process(board)
+            note_button.process()
 
         pygame.display.flip()
 
