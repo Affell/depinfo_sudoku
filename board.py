@@ -20,7 +20,14 @@ class Board:
         self.window = screen.subsurface(pygame.Rect(340, 90, 540, 540))
         self.tiles = [
             [
-                Tile(i * 60, j * 60, progress[i][j], self.init_board[i][j], self.window)
+                Tile(
+                    i * 60,
+                    j * 60,
+                    progress[i][j],
+                    self.init_board[i][j],
+                    self.solution[i][j] == progress[i][j],
+                    self.window,
+                )
                 for j in range(9)
             ]
             for i in range(9)
