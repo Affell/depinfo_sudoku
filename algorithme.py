@@ -115,7 +115,6 @@ def resoud_all_grilles_(grille):
     solutions = []
     vide = case_vide(grille)
     if not vide:
-        print(grille)
         solutions.append(np.array(grille))
         return solutions
     else:
@@ -125,7 +124,7 @@ def resoud_all_grilles_(grille):
         if saisie_valide(grille, i, (row, col)):
             grille[row][col] = i
 
-            for s in resoud_grille_(grille):
+            for s in resoud_all_grilles_(grille):
                 solutions.append(s)
 
             grille[row][col] = 0
@@ -133,22 +132,24 @@ def resoud_all_grilles_(grille):
     return solutions
 
 
-def resoud_grille(grille):
-    return resoud_grille_(np.array(grille))[1]
+def resoud_grille(grille, randomMode=False):
+    return resoud_grille_(np.array(grille), randomMode)[1]
 
 
-def resoud_grille_(grille):
+def resoud_grille_(grille, randomMode):
     vide = case_vide(grille)
     if not vide:
         return True, grille
     else:
         row, col = vide
+    numbers = [i for i in range(1, 10)]
+    if randomMode:
+        random.shuffle(numbers)
+    for nb in numbers:
+        if saisie_valide(grille, nb, (row, col)):
+            grille[row][col] = nb
 
-    for i in range(1, 10):
-        if saisie_valide(grille, i, (row, col)):
-            grille[row][col] = i
-
-            if resoud_grille_(grille)[0]:
+            if resoud_grille_(grille, randomMode)[0]:
                 return True, grille
 
             grille[row][col] = 0
@@ -156,29 +157,28 @@ def resoud_grille_(grille):
     return False, None
 
 
-def permutation_lignes(grille):
-    grille = np.array(grille)
-    perm = np.random.permutation(9)
-    grille_permutee = grille[perm,:]
-    return grille_permutee
+def unicite(solved_grid, grid):
+    for _ in range(5):
+        if not np.array_equal(resoud_grille(grid, True), solved_grid):
+            return False
+    return True
 
-def permutation_colonnes(grille):
-    grille = np.array(grille)
-    perm = np.random.permutation(9)
-    grille_permutee = grille[:,perm]
-    return grille_permutee
 
-def genere_grille(nb):
-    grille = resoud_grille(np.zeros((9,9),dtype = np.intp))
-    for i in range(9):
-        grille = permutation_colonnes(grille)
-        grille = permutation_lignes(grille)
-    
+def genere_grille(nb, progress_bar=None):
+    solution = resoud_grille(np.zeros((9, 9), dtype=np.intp), True)
+    grille = np.array(solution)
+
     cases = [(i, j) for i in range(9) for j in range(9)]
-    for _ in range(len(cases) - nb):
-        i,j= random.choice(cases)
+    nb_operations = len(cases) - nb
+    for k in range(1, nb_operations + 1):
+        (i, j) = None, None
+        temp = np.array(grille)
+        while (i, j) == (None, None) or not unicite(solution, temp):
+            if (i, j) != (None, None):
+                temp[i][j] = grille[i][j]
+            i, j = random.choice(cases)
+            temp[i, j] = 0
         grille[i][j] = 0
-        cases.remove((i,j))
-    return grille
-
-
+        cases.remove((i, j))
+        progress_bar.set_value(k / nb_operations * 100)
+    return grille, solution

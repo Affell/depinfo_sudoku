@@ -4,9 +4,16 @@ import algorithme
 import pygame
 import pygame_menu
 import os
+import threading
 
 board: Board = None
-difficulties = ["Facile", "Moyen", "Difficile", "Expert", "Diabolique"]
+difficulties = {
+    "Facile": 38,
+    "Moyen": 33,
+    "Difficile": 30,
+    "Expert": 28,
+    "Diabolique": 25,
+}
 
 
 def list_grids() -> list[str]:
@@ -26,12 +33,27 @@ def menu_load_grid(name, screen):
         print(f'La grille "{name}" est invalide')
 
 
-def menu_generate_grid(name, difficulty):
+def menu_generate_grid(name, difficulty, screen, menu):
     if len(name.strip()) == 0:
         print("Nom de grille invalide")
         return
     if not os.path.exists(f"./grids/{name}.sudoku"):
-        print(f'Génération de la grille "{name}" ({difficulty})')
+        print(f'Génération de la grille "{name}" ({difficulty})...')
+        progress_bar = menu.add.progress_bar("Génération", default=0)
+
+        def background_generation():
+            grid, solution = algorithme.genere_grille(
+                difficulties[difficulty], progress_bar
+            )
+            global board
+            board = Board(name, screen, grid, grid, 0, solution)
+            board.save()
+
+        t = threading.Thread(
+            target=background_generation, daemon=True, name="Grid generation"
+        )
+        t.start()
+
     else:
         print(f'La grille "{name}" existe déjà')
 
@@ -52,12 +74,15 @@ def build_menu(screen) -> pygame_menu.Menu:
 
     name_input = generate_menu.add.text_input("Nom : ")
     difficulty_selector = generate_menu.add.selector(
-        "Difficulté : ", [(d,) for d in difficulties]
+        "Difficulté : ", [(d,) for d in difficulties.keys()]
     )
     generate_menu.add.button(
         "Valider",
         lambda: menu_generate_grid(
-            name_input.get_value(), difficulty_selector.get_value()[0][0]
+            name_input.get_value(),
+            difficulty_selector.get_value()[0][0],
+            screen,
+            generate_menu,
         ),
     )
 
