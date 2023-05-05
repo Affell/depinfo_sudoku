@@ -106,6 +106,31 @@ def case_vide(grille):
 
 
 # Algo de backtracking pour résoudre une grille rentrée en paramètre
+def resoud_all_grilles(grille):
+    return resoud_all_grilles_(np.array(grille))
+
+
+def resoud_all_grilles_(grille):
+    solutions = []
+    vide = case_vide(grille)
+    if not vide:
+        solutions.append(np.array(grille))
+        return solutions
+    else:
+        row, col = vide
+
+    for i in range(1, 10):
+        if saisie_valide(grille, i, (row, col)):
+            grille[row][col] = i
+
+            for s in resoud_grille_(grille):
+                solutions.append(s)
+
+            grille[row][col] = 0
+
+    return solutions
+
+
 def resoud_grille(grille):
     return resoud_grille_(np.array(grille))[1]
 
