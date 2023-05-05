@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 grille1 = [
     [7, 8, 0, 4, 0, 0, 1, 2, 0],
@@ -114,6 +115,7 @@ def resoud_all_grilles_(grille):
     solutions = []
     vide = case_vide(grille)
     if not vide:
+        print(grille)
         solutions.append(np.array(grille))
         return solutions
     else:
@@ -152,3 +154,31 @@ def resoud_grille_(grille):
             grille[row][col] = 0
 
     return False, None
+
+
+def permutation_lignes(grille):
+    grille = np.array(grille)
+    perm = np.random.permutation(9)
+    grille_permutee = grille[perm,:]
+    return grille_permutee
+
+def permutation_colonnes(grille):
+    grille = np.array(grille)
+    perm = np.random.permutation(9)
+    grille_permutee = grille[:,perm]
+    return grille_permutee
+
+def genere_grille(nb):
+    grille = resoud_grille(np.zeros((9,9),dtype = np.intp))
+    for i in range(9):
+        grille = permutation_colonnes(grille)
+        grille = permutation_lignes(grille)
+    
+    cases = [(i, j) for i in range(9) for j in range(9)]
+    for _ in range(len(cases) - nb):
+        i,j= random.choice(cases)
+        grille[i][j] = 0
+        cases.remove((i,j))
+    return grille
+
+
