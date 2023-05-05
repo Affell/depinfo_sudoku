@@ -91,6 +91,8 @@ def grille_valide(grille_jeu):
 
 
 def saisie_valide(grille, nb, pos):
+    n = len(grille[0])
+    m = int((n**0.5))
     # Vérif ligne
     for i in range(len(grille[0])):
         if grille[pos[0]][i] == nb and pos[1] != i:
@@ -102,11 +104,11 @@ def saisie_valide(grille, nb, pos):
             return False
 
     # Vérif carrés
-    case_x = pos[1] // 3
-    case_y = pos[0] // 3
+    case_x = pos[1] // m
+    case_y = pos[0] // m 
 
-    for i in range(case_y * 3, case_y * 3 + 3):
-        for j in range(case_x * 3, case_x * 3 + 3):
+    for i in range(case_y * m, case_y * m + m):
+        for j in range(case_x * m, case_x * m + m):
             if grille[i][j] == nb and (i, j) != pos:
                 return False
 
@@ -124,7 +126,6 @@ def case_vide(grille):
 
     return None
 
-
 # Algo de backtracking pour résoudre une grille rentrée en paramètre
 def resoud_all_grilles(grille):
     return resoud_all_grilles_(np.array(grille))
@@ -139,7 +140,7 @@ def resoud_all_grilles_(grille):
     else:
         row, col = vide
 
-    for i in range(1, 10):
+    for i in range(1, len(grille) + 1):
         if saisie_valide(grille, i, (row, col)):
             grille[row][col] = i
 
@@ -161,7 +162,7 @@ def resoud_grille_(grille, randomMode):
         return True, grille
     else:
         row, col = vide
-    numbers = [i for i in range(1, 10)]
+    numbers = [i for i in range(1, len(grille) +1 )]
     if randomMode:
         random.shuffle(numbers)
     for nb in numbers:
@@ -183,11 +184,11 @@ def unicite(solved_grid, grid):
     return True
 
 
-def genere_grille(nb, progress_bar=None):
-    solution = resoud_grille(np.zeros((9, 9), dtype=np.intp), True)
+def genere_grille(nb, taille,progress_bar=None):
+    solution = resoud_grille(np.zeros((taille, taille), dtype=np.intp), True)
     grille = np.array(solution)
 
-    cases = [(i, j) for i in range(9) for j in range(9)]
+    cases = [(i, j) for i in range(taille) for j in range(taille)]
     nb_operations = len(cases) - nb
     for k in range(1, nb_operations + 1):
         (i, j) = None, None
@@ -201,3 +202,17 @@ def genere_grille(nb, progress_bar=None):
         cases.remove((i, j))
         progress_bar.set_value(k / nb_operations * 100)
     return grille, solution
+
+#Si tu veux tester (y'a juste une erreur avec la barre de progression quand je le lance)
+
+# grille = genere_grille(158,16)
+# print(grille)
+# print(resoud_grille(grille))
+# print()
+# grille1 = genere_grille(9,4)
+# print(grille1)
+# print(resoud_grille(grille1))
+# print()
+# grille2 = genere_grille(35,9)
+# print(grille2)
+# print(resoud_grille(grille2))
