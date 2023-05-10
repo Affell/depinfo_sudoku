@@ -21,11 +21,11 @@ difficulties = {
         "Diabolique": 25,
     },
     "16x16": {
-        "Facile": 180,
-        "Moyen": 140,
-        "Difficile": 130,
-        "Expert": 120,
-        "Diabolique": 110,
+        "Facile": 160,
+        "Moyen": 145,
+        "Difficile": 135,
+        "Expert": 125,
+        "Diabolique": 115,
     },
 }
 
@@ -37,11 +37,11 @@ def list_grids() -> list[str]:
 def menu_load_grid(name, screen):
     grid, progress, notes, noteMode, errors = algorithme.lecture_grille(name)
     if algorithme.grille_valide(grid):
-        solution = algorithme.resoud_grille(grid)
-        if solution is not None:
+        solution = algorithme.resoud_grille(grid, 1)
+        if len(solution) == 1:
             global board
             board = Board(
-                name, screen, grid, progress, notes, noteMode, errors, solution
+                name, screen, grid, progress, notes, noteMode, errors, solution[0]
             )
         else:
             print(f'Aucune solution n\'a pu être trouvée pour la grille "{name}"')

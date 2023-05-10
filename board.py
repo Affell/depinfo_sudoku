@@ -19,20 +19,30 @@ class Board:
         self.name = name
         self.init_board = np.array(matrix)
         self.size = self.init_board.shape[0]
+        self.bloc_size = int(self.size**0.5)
+        self.cell_size = int(180 // self.bloc_size)
+        self.board_size = int(self.size * self.cell_size)
+        self.offset = (
+            int((1280 - self.board_size) / 2),
+            int((720 - self.board_size) / 2),
+        )
         self.error_count = errors
         self.solution = np.array(solution)
-        self.window = screen.subsurface(pygame.Rect(340, 90, 540, 540))
+        self.window = screen.subsurface(
+            pygame.Rect(*self.offset, self.board_size, self.board_size)
+        )
         self.tiles = [
             [
                 Tile(
-                    i * (540 // self.size),
-                    j * (540 // self.size),
+                    i * self.cell_size,
+                    j * self.cell_size,
                     progress[i][j],
                     self.init_board[i][j],
                     notes[i][j] if len(notes) > 0 else [],
                     self.solution[i][j] == progress[i][j],
                     self.window,
-                    540 // self.size,
+                    self.cell_size,
+                    self.bloc_size,
                 )
                 for j in range(self.size)
             ]
@@ -46,19 +56,19 @@ class Board:
             for j in range(self.size):
                 self.tiles[i][j].draw()
                 self.tiles[i][j].display()
-        for i in range(1, int(self.size**0.5) + 1):
+        for i in range(1, int(self.bloc_size) + 1):
             pygame.draw.line(
                 self.window,
                 (0, 0, 0),
-                (i * (540 // self.size) * self.size**0.5, 0),
-                (i * (540 // self.size) * self.size**0.5, 540),
+                (i * self.cell_size * self.bloc_size, 0),
+                (i * self.cell_size * self.bloc_size, self.board_size),
                 5,
             )
             pygame.draw.line(
                 self.window,
                 (0, 0, 0),
-                (0, i * (540 // self.size) * self.size**0.5),
-                (540, i * (540 // self.size) * self.size**0.5),
+                (0, i * self.cell_size * self.bloc_size),
+                (self.board_size, i * self.cell_size * self.bloc_size),
                 5,
             )
 
@@ -69,10 +79,10 @@ class Board:
         )
 
     def get_tile(self, x, y) -> Tile:
-        x -= 340
-        y -= 90
-        if 0 <= x < 540 and 0 <= y < 540:
-            return self.tiles[y // (540 // self.size)][x // (540 // self.size)]
+        x -= self.offset[0]
+        y -= self.offset[1]
+        if 0 <= x < self.board_size and 0 <= y < self.board_size:
+            return self.tiles[y // self.cell_size][x // self.cell_size]
         return None
 
     def select_tile(self, tile: Tile):
@@ -87,8 +97,8 @@ class Board:
                 elif (
                     i == pos[0]
                     or j == pos[1]
-                    or (i // self.size**0.5, j // self.size**0.5)
-                    == (pos[0] // self.size**0.5, pos[1] // self.size**0.5)
+                    or (i // self.bloc_size, j // self.bloc_size)
+                    == (pos[0] // self.bloc_size, pos[1] // self.bloc_size)
                 ):
                     self.tiles[i][j].background_color = "gray"
                 else:

@@ -57,7 +57,7 @@ def get_allowed_characters(taille, zeros=True):
 
 
 def get_character_index(char):
-    return ord(char) - 48 if 49 <= ord(char) <= 57 else ord(char) - 55
+    return ord(char) - 49 if 49 <= ord(char) <= 57 else ord(char) - 56
 
 
 # Vérifie de la validité de la grille(on peut ajouter d'autres vérifications)
@@ -100,92 +100,107 @@ def saisie_valide(grille, char, pos):
 # Cherche les cases vides dans la grille
 
 
-def case_vide(grille):
+def get_possibilities(grille, chars, randomMode):
+    p = [[[] for _ in range(len(grille[i]))] for i in range(len(grille))]
+    x, y = None, None
     for i in range(len(grille)):
         for j in range(len(grille[0])):
             if grille[i][j] == "0":
-                return (i, j)
+                if randomMode:
+                    random.shuffle(chars)
+                for char in chars:
+                    if saisie_valide(grille, char, (i, j)):
+                        p[i][j].append(char)
+                if x is None or len(p[x][y]) > len(p[i][j]):
+                    x, y = i, j
+    return p, (x, y)
 
-    return None
+
+def get_next_case(grille, possibilities):
+    x, y = None, None
+    for i in range(len(possibilities)):
+        for j in range(len(possibilities[0])):
+            if grille[i][j] == "0" and (
+                x is None or len(possibilities[x][y]) > len(possibilities[i][j])
+            ):
+                x, y = i, j
+    return x, y
+
+
+def update_possibilities(possibilities, case, char):
+    new = [
+        [[] for _ in range(len(possibilities[i]))] for i in range(len(possibilities))
+    ]
+    for i in range(len(possibilities)):
+        for j in range(len(possibilities[0])):
+            if (i, j) != case:
+                new[i][j] = [
+                    c
+                    for c in possibilities[i][j]
+                    if not (
+                        (i == case[0] and j != case[1])
+                        or (i != case[0] and j == case[1])
+                        or (
+                            i // len(possibilities) ** 0.5
+                            == case[0] // len(possibilities) ** 0.5
+                            and j // len(possibilities) ** 0.5
+                            == case[1] // len(possibilities) ** 0.5
+                        )
+                    )
+                    or c != char
+                ]
+    return new
 
 
 # Algo de backtracking pour résoudre une grille rentrée en paramètre
-def resoud_all_grilles(grille):
-    return resoud_all_grilles_(
-        np.array(grille), get_allowed_characters(len(grille), False)
+def resoud_grille(grille, limit=1, randomMode=False):
+    return __resoud_grille(
+        np.array(grille), get_allowed_characters(len(grille), False), limit, randomMode
     )
 
 
-def resoud_all_grilles_(grille, chars):
+def __resoud_grille(grille, chars, limit, randomMode, possibilities=None):
     solutions = []
-    vide = case_vide(grille)
-    if not vide:
+    if possibilities is None:
+        possibilities, nextCase = get_possibilities(grille, chars, randomMode)
+    else:
+        nextCase = get_next_case(grille, possibilities)
+    row, col = nextCase
+    if nextCase == (None, None):
         solutions.append(np.array(grille))
         return solutions
-    else:
-        row, col = vide
+    for char in possibilities[row][col]:
+        grille[row][col] = char
+        p = update_possibilities(possibilities, (row, col), char)
 
-    for char in chars:
-        if saisie_valide(grille, char, (row, col)):
-            grille[row][col] = char
+        for s in __resoud_grille(grille, chars, limit, randomMode, p):
+            solutions.append(s)
+            if len(solutions) == limit:
+                return solutions
 
-            for s in resoud_all_grilles_(grille, chars):
-                solutions.append(s)
-
-            grille[row][col] = "0"
+        grille[row][col] = "0"
 
     return solutions
 
 
-def resoud_grille(grille, randomMode=False):
-    return resoud_grille_(
-        np.array(grille), get_allowed_characters(len(grille), False), randomMode
-    )[1]
-
-
-def resoud_grille_(grille, chars, randomMode):
-    vide = case_vide(grille)
-    if not vide:
-        return True, grille
-    else:
-        row, col = vide
-    if randomMode:
-        random.shuffle(chars)
-    for char in chars:
-        if saisie_valide(grille, char, (row, col)):
-            grille[row][col] = char
-
-            if resoud_grille_(grille, chars, randomMode)[0]:
-                return True, grille
-
-            grille[row][col] = "0"
-
-    return False, None
-
-
-def unicite(solved_grid, grid):
-    for _ in range(5):
-        if not np.array_equal(resoud_grille(grid, True), solved_grid):
-            return False
-    return True
-
-
 def genere_grille(nb, taille, progress_bar=None):
-    solution = resoud_grille(np.full((taille, taille), "0", dtype=str), True)
+    solution = resoud_grille(np.full((taille, taille), "0", dtype=str), 1, True)[0]
     grille = np.array(solution)
 
     cases = [(i, j) for i in range(taille) for j in range(taille)]
+    random.shuffle(cases)
     nb_operations = len(cases) - nb
     for k in range(1, nb_operations + 1):
-        (i, j) = None, None
         temp = np.array(grille)
-        while (i, j) == (None, None) or not unicite(solution, temp):
+        (i, j) = None, None
+        while (i, j) == (None, None) or len(resoud_grille(temp, limit=2)) > 1:
+            if len(cases) == 0:
+                return None, solution
             if (i, j) != (None, None):
                 temp[i][j] = grille[i][j]
-            i, j = random.choice(cases)
-            temp[i, j] = 0
+            i, j = cases.pop()
+            temp[i][j] = 0
         grille[i][j] = 0
-        cases.remove((i, j))
         if progress_bar is not None:
             progress_bar.set_value(k / nb_operations * 100)
     return grille, solution

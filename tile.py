@@ -3,7 +3,7 @@ import algorithme
 
 
 class Tile:
-    def __init__(self, x, y, value, init_value, notes, valid, window, size):
+    def __init__(self, x, y, value, init_value, notes, valid, window, size, bloc_size):
         self.x = x
         self.y = y
         self.value = value
@@ -12,6 +12,7 @@ class Tile:
         self.valid = valid
         self.window = window
         self.size = size
+        self.bloc_size = bloc_size
         self.rect = pygame.Rect(y, x, self.size, self.size)
         self.background_color = "white"
         self.selected = False
@@ -23,7 +24,7 @@ class Tile:
 
     def display(self):
         if self.value != "0":
-            font = pygame.font.SysFont("arial", 50)
+            font = pygame.font.SysFont("arial", 80 - 10 * self.bloc_size)
             color = "red"
             if self.init_value == "0" and self.valid:
                 color = "blue"
@@ -32,15 +33,20 @@ class Tile:
             text = font.render(self.value, True, color)
             self.window.blit(text, text.get_rect(center=self.rect.center))
         elif len(self.notes) > 0:
-            font = pygame.font.SysFont("arial", 15)
+            font = pygame.font.SysFont("arial", 24 - 3 * self.bloc_size)
+            w, h = font.size(self.notes[0])
             for i in range(len(self.notes)):
                 pos = (
                     self.y
-                    + 10
-                    + 20 * ((algorithme.get_character_index(self.notes[i]) - 1) % 3),
+                    + 1
+                    + (self.size / self.bloc_size) // 2
+                    + (self.size // self.bloc_size)
+                    * (algorithme.get_character_index(self.notes[i]) % self.bloc_size),
                     self.x
-                    + 10
-                    + 20 * ((algorithme.get_character_index(self.notes[i]) - 1) // 3),
+                    + 1
+                    + (self.size / self.bloc_size) // 2
+                    + (self.size // self.bloc_size)
+                    * (algorithme.get_character_index(self.notes[i]) // self.bloc_size),
                 )
                 text = font.render(self.notes[i], True, (0, 0, 0))
                 self.window.blit(text, text.get_rect(center=pos))
