@@ -138,6 +138,8 @@ def game_loop():
         "red",
         buttonText="Note",
         image="./resources/note-button.png",
+        imageOffset=(-32, -50),
+        textOffset=(0, 30),
     )
 
     def on_click():
@@ -176,7 +178,6 @@ def game_loop():
 
             if board.error_count == 3:
                 board.show_error_message()
-                
 
         pygame.display.flip()
 
