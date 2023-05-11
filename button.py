@@ -22,6 +22,7 @@ class Button:
             "hover": "#666666",
             "pressed": "#333333",
         },
+        borderRadius=0,
     ):
         self.x = x
         self.y = y
@@ -34,6 +35,7 @@ class Button:
         self.onePress = onePress
         self.alreadyPressed = False
         self.fillColors = fillColors
+        self.borderRadius = borderRadius
         self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.buttonSurface = window.subsurface(self.buttonRect)
 
@@ -45,11 +47,11 @@ class Button:
 
     def process(self):
         mousePos = pygame.mouse.get_pos()
-        self.buttonSurface.fill(self.fillColors["normal"])
+        color = "normal"
         if self.buttonRect.collidepoint(mousePos):
-            self.buttonSurface.fill(self.fillColors["hover"])
+            color = "hover"
             if pygame.mouse.get_pressed(num_buttons=3)[0]:
-                self.buttonSurface.fill(self.fillColors["pressed"])
+                color = "pressed"
                 if self.onePress:
                     self.onclickFunction()
                 elif not self.alreadyPressed:
@@ -57,6 +59,12 @@ class Button:
                     self.alreadyPressed = True
             else:
                 self.alreadyPressed = False
+        pygame.draw.rect(
+            self.window,
+            self.fillColors[color],
+            self.buttonRect,
+            border_radius=self.borderRadius,
+        )
         text = self.font.render(self.buttonText, True, self.fontColor)
         self.window.blit(
             text,
