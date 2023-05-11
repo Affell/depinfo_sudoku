@@ -149,6 +149,9 @@ def game_loop():
 
     running = True
     while running:
+        if board is not None and not board.active:
+            board = None
+
         events = pygame.event.get()
 
         for event in events:
@@ -156,7 +159,7 @@ def game_loop():
                 if board is not None:
                     board.save()
                 running = False
-            elif board is not None and event.type == pygame.KEYDOWN:
+            elif board is not None and not board.pause and event.type == pygame.KEYDOWN:
                 try:
                     board.enter_char(event.unicode.upper())
                 except ValueError as _:
@@ -166,7 +169,7 @@ def game_loop():
             menu.update(events)
             menu.draw(screen)
         else:
-            if pygame.mouse.get_pressed() == (1, 0, 0):
+            if not board.pause and pygame.mouse.get_pressed() == (1, 0, 0):
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:
                     board.select_tile(tile)

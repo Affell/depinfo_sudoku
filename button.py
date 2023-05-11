@@ -47,6 +47,7 @@ class Button:
 
     def process(self):
         mousePos = pygame.mouse.get_pos()
+        print(self.buttonText, mousePos, self.buttonRect.collidepoint(mousePos))
         color = "normal"
         if self.buttonRect.collidepoint(mousePos):
             color = "hover"

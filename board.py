@@ -4,6 +4,7 @@ from tile import Tile
 import algorithme
 from button import Button
 
+
 class Board:
     def __init__(
         self,
@@ -16,6 +17,8 @@ class Board:
         errors: int,
         solution: np.ndarray,
     ):
+        self.active = True
+        self.pause = False
         self.name = name
         self.init_board = np.array(matrix)
         self.size = self.init_board.shape[0]
@@ -28,6 +31,7 @@ class Board:
         )
         self.error_count = errors
         self.solution = np.array(solution)
+        self.screen = window
         self.window = window.subsurface(
             pygame.Rect(*self.offset, self.board_size, self.board_size)
         )
@@ -50,6 +54,8 @@ class Board:
         ]
         self.noteMode = noteMode
         self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30))
+        self.back_menu = None
+        self.new_game = None
 
     def draw_board(self):
         for i in range(self.size):
@@ -148,66 +154,79 @@ class Board:
             )
 
     def show_error_message(self):
+        self.pause = True
 
-        gray_surface = pygame.Surface((self.window.get_width(), self.window.get_height()))
+        gray_surface = pygame.Surface(
+            (self.screen.get_width(), self.screen.get_height())
+        )
         gray_surface.set_alpha(200)
         gray_surface.fill((0, 0, 0))
-        self.window.blit(gray_surface, (0, 0))
+        self.screen.blit(gray_surface, (0, 0))
 
-        message_rect = pygame.Rect(self.window.get_width() // 2 - 200, self.window.get_height() // 2 - 100, 400, 200)
-        pygame.draw.rect(self.window, (250, 250, 250), message_rect, border_radius=20)
+        message_rect = pygame.Rect(
+            self.screen.get_width() // 2 - 200,
+            self.screen.get_height() // 2 - 100,
+            400,
+            200,
+        )
+        pygame.draw.rect(self.screen, (250, 250, 250), message_rect, border_radius=20)
 
         font = pygame.font.SysFont("arial", 30)
         font2 = pygame.font.SysFont("arial", 20)
-        text = font.render("Partie terminée", True, (0,0,0))
-        text2 = font2.render("Vous avez fait trop d'erreur", True, (186,186,186))
+        text = font.render("Partie terminée", True, (0, 0, 0))
+        text2 = font2.render("Vous avez fait trop d'erreur", True, (186, 186, 186))
 
         text_rect = text.get_rect(center=message_rect.center)
-        text_rect = text_rect.move(0,-35)
-        self.window.blit(text,text_rect)
+        text_rect = text_rect.move(0, -35)
+        self.screen.blit(text, text_rect)
         text_rect = text.get_rect(center=message_rect.center)
-        text_rect = text_rect.move(-10,5)
-        self.window.blit(text2,text_rect)
+        text_rect = text_rect.move(-10, 5)
+        self.screen.blit(text2, text_rect)
 
-        self.back_menu: Button = Button(
-            message_rect.left + 45,
-            message_rect.bottom - 80,
-            self.window,
-            155,
-            40,
-            "white",
-            buttonText="Retour à l'accueil",
-            fontSize=20,
-            fillColors={
-            "normal": "#0048f9",
-            "hover": "#666666",
-            "pressed": "#0093f9",
-            },
-            borderRadius = 10
+        def back_menu_f():
+            print("AFTGACSV")
+            self.active = False
+
+        self.back_menu: Button = (
+            self.back_menu
+            if self.back_menu is not None
+            else Button(
+                message_rect.left + 45,
+                message_rect.bottom - 80,
+                self.screen,
+                155,
+                40,
+                "white",
+                buttonText="Retour à l'accueil",
+                fontSize=20,
+                onclickFunction=back_menu_f,
+                fillColors={
+                    "normal": "#0048f9",
+                    "hover": "#666666",
+                    "pressed": "#0093f9",
+                },
+                borderRadius=10,
+            )
         )
 
-        self.new_game:Button = Button(
-            message_rect.right - 195,
-            message_rect.bottom - 80,
-            self.window,
-            145,
-            40,
-            "black",
-            buttonText="Nouvelle partie",
-            fontSize=20,
-            fillColors={
-            "normal": "#ffffff",
-            "hover": "#dadada",
-            "pressed": "#ffffff",
-            },
-            borderRadius = 10
-
+        self.new_game: Button = (
+            self.new_game
+            if self.new_game is not None
+            else Button(
+                message_rect.right - 195,
+                message_rect.bottom - 80,
+                self.screen,
+                145,
+                40,
+                "black",
+                buttonText="Nouvelle partie",
+                fontSize=20,
+                onclickFunction=back_menu_f,
+                fillColors={
+                    "normal": "#ffffff",
+                    "hover": "#dadada",
+                    "pressed": "#ffffff",
+                },
+                borderRadius=10,
+            )
         )
-
-  
-
-
-        
-                
-
-                
