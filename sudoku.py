@@ -122,6 +122,7 @@ def build_menu(screen) -> pygame_menu.Menu:
 
 def game_loop():
 
+    global board
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((1280, 720))
@@ -172,6 +173,10 @@ def game_loop():
             board.draw_board()
             note_button.fontColor = "green" if board.noteMode else "red"
             note_button.process()
+
+            if board.error_count == 3:
+                board.show_error_message()
+                
 
         pygame.display.flip()
 

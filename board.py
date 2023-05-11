@@ -2,13 +2,13 @@ import numpy as np
 import pygame
 from tile import Tile
 import algorithme
-
+from button import Button
 
 class Board:
     def __init__(
         self,
         name: str,
-        screen: pygame.Surface,
+        window: pygame.Surface,
         matrix: np.ndarray,
         progress: np.ndarray,
         notes: np.ndarray,
@@ -28,7 +28,7 @@ class Board:
         )
         self.error_count = errors
         self.solution = np.array(solution)
-        self.window = screen.subsurface(
+        self.window = window.subsurface(
             pygame.Rect(*self.offset, self.board_size, self.board_size)
         )
         self.tiles = [
@@ -49,7 +49,7 @@ class Board:
             for i in range(self.size)
         ]
         self.noteMode = noteMode
-        self.error_rect = screen.subsurface(pygame.Rect(950, 50, 200, 30))
+        self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30))
 
     def draw_board(self):
         for i in range(self.size):
@@ -146,3 +146,39 @@ class Board:
                     for line in self.tiles
                 ]
             )
+
+    def show_error_message(self):
+
+        gray_surface = pygame.Surface((self.window.get_width(), self.window.get_height()))
+        gray_surface.set_alpha(200)
+        gray_surface.fill((0, 0, 0))
+        self.window.blit(gray_surface, (0, 0))
+
+        message_rect = pygame.Rect(self.window.get_width() // 2 - 200, self.window.get_height() // 2 - 100, 400, 200)
+        pygame.draw.rect(self.window, (250, 250, 250), message_rect, border_radius=20)
+
+        font = pygame.font.SysFont("arial", 30)
+        font2 = pygame.font.SysFont("arial", 20)
+        text = font.render("Partie terminée", True, (0,0,0))
+        text2 = font2.render("Vous avez fait trop d'erreur", True, (186,186,186))
+
+        text_rect = text.get_rect(center=message_rect.center)
+        text_rect = text_rect.move(0,-35)
+        self.window.blit(text,text_rect)
+        text_rect = text.get_rect(center=message_rect.center)
+        text_rect = text_rect.move(-10,5)
+        self.window.blit(text2,text_rect)
+                
+        button_rect1 = pygame.Rect(message_rect.left + 50, message_rect.bottom - 80, 145, 40)
+        pygame.draw.rect(self.window, (0,72,249), button_rect1, border_radius=10) 
+        font = pygame.font.SysFont("arial", 20)
+        text = font.render("Nouvelle partie", True, "white")
+        self.window.blit(text, text.get_rect(center=button_rect1.center))
+
+        button_rect2 = pygame.Rect(message_rect.right - 200, message_rect.bottom - 80, 145, 40)
+        pygame.draw.rect(self.window, (255, 255, 255), button_rect2, border_radius=10) 
+        text = font.render("Menu principal", True, "black")
+        self.window.blit(text, text.get_rect(center=button_rect2.center))
+                
+
+                
