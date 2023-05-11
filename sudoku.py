@@ -178,6 +178,8 @@ def game_loop():
 
             if board.error_count == 3:
                 board.show_error_message()
+                board.back_menu.process()
+                board.new_game.process()
 
         pygame.display.flip()
 

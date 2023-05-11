@@ -168,17 +168,46 @@ class Board:
         text_rect = text.get_rect(center=message_rect.center)
         text_rect = text_rect.move(-10,5)
         self.window.blit(text2,text_rect)
-                
-        button_rect1 = pygame.Rect(message_rect.left + 50, message_rect.bottom - 80, 145, 40)
-        pygame.draw.rect(self.window, (0,72,249), button_rect1, border_radius=10) 
-        font = pygame.font.SysFont("arial", 20)
-        text = font.render("Nouvelle partie", True, "white")
-        self.window.blit(text, text.get_rect(center=button_rect1.center))
 
-        button_rect2 = pygame.Rect(message_rect.right - 200, message_rect.bottom - 80, 145, 40)
-        pygame.draw.rect(self.window, (255, 255, 255), button_rect2, border_radius=10) 
-        text = font.render("Menu principal", True, "black")
-        self.window.blit(text, text.get_rect(center=button_rect2.center))
+        self.back_menu: Button = Button(
+            message_rect.left + 45,
+            message_rect.bottom - 80,
+            self.window,
+            155,
+            40,
+            "white",
+            buttonText="Retour à l'accueil",
+            fontSize=20,
+            fillColors={
+            "normal": "#0048f9",
+            "hover": "#666666",
+            "pressed": "#0093f9",
+            },
+            borderRadius = 10
+        )
+
+        self.new_game:Button = Button(
+            message_rect.right - 195,
+            message_rect.bottom - 80,
+            self.window,
+            145,
+            40,
+            "black",
+            buttonText="Nouvelle partie",
+            fontSize=20,
+            fillColors={
+            "normal": "#ffffff",
+            "hover": "#dadada",
+            "pressed": "#ffffff",
+            },
+            borderRadius = 10
+
+        )
+
+  
+
+
+        
                 
 
                 
