@@ -166,9 +166,14 @@ def game_loop():
                     pass
 
         if board is None:
+            if not menu.is_enabled():
+                menu.enable()
             menu.update(events)
             menu.draw(screen)
         else:
+            if menu.is_enabled():
+                menu.disable()
+                menu.full_reset()
             if not board.pause and pygame.mouse.get_pressed() == (1, 0, 0):
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:
