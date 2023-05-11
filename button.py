@@ -75,10 +75,11 @@ class Button:
                 )
             ),
         )
-        self.window.blit(
-            self.image,
-            (
-                self.buttonRect.center[0] + self.imageOffset[0],
-                self.buttonRect.center[1] + self.imageOffset[1],
-            ),
-        )
+        if self.image is not None:
+            self.window.blit(
+                self.image,
+                (
+                    self.buttonRect.center[0] + self.imageOffset[0],
+                    self.buttonRect.center[1] + self.imageOffset[1],
+                ),
+            )
