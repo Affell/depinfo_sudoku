@@ -184,7 +184,6 @@ class Board:
         self.screen.blit(text2, text_rect)
 
         def back_menu_f():
-            print("AFTGACSV")
             self.active = False
 
         self.back_menu: Button = (
