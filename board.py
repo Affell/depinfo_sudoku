@@ -3,6 +3,7 @@ import pygame
 from tile import Tile
 import algorithme
 from button import Button
+from timer import Timer
 
 
 class Board:
@@ -17,6 +18,7 @@ class Board:
         errors: int,
         solution: np.ndarray,
     ):
+        self.timer = Timer
         self.active = True
         self.pause = False
         self.name = name

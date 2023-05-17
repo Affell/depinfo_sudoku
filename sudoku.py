@@ -5,6 +5,7 @@ import pygame
 import pygame_menu
 import os
 import threading
+from timer import Timer
 
 board: Board = None
 sizes = {"4x4": 4, "9x9": 9, "16x16": 16}
@@ -129,6 +130,9 @@ def game_loop():
 
     menu: pygame_menu.Menu = build_menu(screen)
 
+    def on_click():
+        board.noteMode = not board.noteMode
+
     note_button: Button = Button(
         1000,
         90,
@@ -137,13 +141,38 @@ def game_loop():
         100,
         "red",
         buttonText="Note",
+        onclickFunction=on_click,
         image="./resources/note-button.png",
         imageOffset=(-32, -50),
         textOffset=(0, 30),
     )
 
-    def on_click():
-        board.noteMode = not board.noteMode
+    def back_menu_f():
+        board.active = False
+
+    back_home: Button = Button(
+        1000,
+        200,
+        screen,
+        100,
+        100,
+        "black",
+        buttonText="Accueil",
+        fontSize=20,
+        onclickFunction=back_menu_f,
+    )
+
+    timer_button: Timer = Timer(
+        600,
+        50,
+        screen,
+        100,
+        50,
+        "black",
+        buttonText="Timer",
+        fontSize= 30,
+    )
+    
 
     note_button.onclickFunction = on_click
 
@@ -183,6 +212,8 @@ def game_loop():
             board.draw_board()
             note_button.fontColor = "green" if board.noteMode else "red"
             note_button.process()
+            back_home.process()
+            timer_button.process()
 
             if board.error_count == 3:
                 board.show_error_message()
