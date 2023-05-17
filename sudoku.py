@@ -74,7 +74,7 @@ def menu_generate_grid(name, size, difficulty, screen, menu):
         print(f'La grille "{name}" existe déjà')
 
 
-def build_menu(screen) -> pygame_menu.Menu:
+def build_menu(screen) -> tuple[pygame_menu.Menu]:
     menu = pygame_menu.Menu(
         "Sudoku", 1280, 720, theme=pygame_menu.themes.THEME_DARK, columns=2, rows=2
     )
@@ -117,7 +117,7 @@ def build_menu(screen) -> pygame_menu.Menu:
     menu.add.button("Charger une grille", load_menu)
     menu.add.button("Nouvelle grille", generate_menu)
 
-    return menu
+    return menu, load_menu, generate_menu
 
 
 def game_loop():
@@ -127,7 +127,7 @@ def game_loop():
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((1280, 720))
 
-    menu: pygame_menu.Menu = build_menu(screen)
+    menu, load_menu, generate_menu = build_menu(screen)
 
     note_button: Button = Button(
         1000,
