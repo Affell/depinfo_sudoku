@@ -16,6 +16,7 @@ class Timer:
         elapsed_time = 0,
         minutes = 0,
         seconds = 0,
+        stop = False,
     ):
         self.x = x
         self.y = y
@@ -31,27 +32,49 @@ class Timer:
         self.font = pygame.font.SysFont("Arial", self.fontSize)
         self.minutes = minutes
         self.seconds = seconds
+        self.stop = stop
 
     def process(self):
-        self.elapsed_time = pygame.time.get_ticks() - self.start_time
-        self.minutes = self.elapsed_time // 60000
-        self.seconds = (self.elapsed_time // 1000) % 60
-        time_text = f"Time: {self.minutes:02d}:{self.seconds:02d}"
-        self.buttonText = time_text
+        if self.stop == False:
+            self.elapsed_time = pygame.time.get_ticks() - self.start_time
+            self.minutes = self.elapsed_time // 60000
+            self.seconds = (self.elapsed_time // 1000) % 60
+            time_text = f"Time: {self.minutes:02d}:{self.seconds:02d}"
+            self.buttonText = time_text
 
-        text = self.font.render(self.buttonText, True, self.fontColor)
+            text = self.font.render(self.buttonText, True, self.fontColor)
+            
+            pygame.draw.rect(
+                self.window,
+                (255,255,255),
+                self.buttonRect,
+            )
+            self.window.blit(
+                text,
+                text.get_rect(
+                    center=(
+                        self.buttonRect.center[0],
+                        self.buttonRect.center[1],
+                    )
+                ),
+            )
+        else:
+            time_text = f"Time: {self.minutes:02d}:{self.seconds:02d}"
+            text = self.font.render(self.buttonText, True, self.fontColor)
+            
+            pygame.draw.rect(
+                self.window,
+                (255,255,255),
+                self.buttonRect,
+            )
+            self.window.blit(
+                text,
+                text.get_rect(
+                    center=(
+                        self.buttonRect.center[0],
+                        self.buttonRect.center[1],
+                    )
+                ),
+            )
+
         
-        pygame.draw.rect(
-            self.window,
-            (255,255,255),
-            self.buttonRect,
-        )
-        self.window.blit(
-            text,
-            text.get_rect(
-                center=(
-                    self.buttonRect.center[0],
-                    self.buttonRect.center[1],
-                )
-            ),
-        )

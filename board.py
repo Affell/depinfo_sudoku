@@ -81,7 +81,7 @@ class Board:
             )
 
         font = pygame.font.SysFont("arial", 20)
-        text = font.render(f"erreurs : {self.error_count}", True, "black")
+        text = font.render(f"Erreurs : {self.error_count}", True, "black")
         self.error_rect.blit(
             text, text.get_rect(center=self.error_rect.get_rect().center)
         )
@@ -157,7 +157,7 @@ class Board:
 
     def show_error_message(self):
         self.pause = True
-
+        
         gray_surface = pygame.Surface(
             (self.screen.get_width(), self.screen.get_height())
         )
@@ -231,3 +231,80 @@ class Board:
                 borderRadius=10,
             )
         )
+
+    def show_win_message(self):
+            self.pause = True
+            
+            gray_surface = pygame.Surface(
+                (self.screen.get_width(), self.screen.get_height())
+            )
+            gray_surface.set_alpha(200)
+            gray_surface.fill((0, 0, 0))
+            self.screen.blit(gray_surface, (0, 0))
+
+            message_rect = pygame.Rect(
+                self.screen.get_width() // 2 - 200,
+                self.screen.get_height() // 2 - 100,
+                400,
+                200,
+            )
+            pygame.draw.rect(self.screen, (250, 250, 250), message_rect, border_radius=20)
+
+            font = pygame.font.SysFont("arial", 30)
+            font2 = pygame.font.SysFont("arial", 20)
+            text = font.render("Partie terminée", True, (0, 0, 0))
+            text2 = font2.render("Vous avez gagné", True, (186, 186, 186))
+
+            text_rect = text.get_rect(center=message_rect.center)
+            text_rect = text_rect.move(0, -35)
+            self.screen.blit(text, text_rect)
+            text_rect = text.get_rect(center=message_rect.center)
+            text_rect = text_rect.move(20, 5)
+            self.screen.blit(text2, text_rect)
+
+            def back_menu_f():
+                self.active = False
+
+            self.back_menu: Button = (
+                self.back_menu
+                if self.back_menu is not None
+                else Button(
+                    message_rect.left + 45,
+                    message_rect.bottom - 80,
+                    self.screen,
+                    155,
+                    40,
+                    "white",
+                    buttonText="Retour à l'accueil",
+                    fontSize=20,
+                    onclickFunction=back_menu_f,
+                    fillColors={
+                        "normal": "#0048f9",
+                        "hover": "#666666",
+                        "pressed": "#0093f9",
+                    },
+                    borderRadius=10,
+                )
+            )
+
+            self.new_game: Button = (
+                self.new_game
+                if self.new_game is not None
+                else Button(
+                    message_rect.right - 195,
+                    message_rect.bottom - 80,
+                    self.screen,
+                    145,
+                    40,
+                    "black",
+                    buttonText="Nouvelle partie",
+                    fontSize=20,
+                    onclickFunction=back_menu_f,
+                    fillColors={
+                        "normal": "#ffffff",
+                        "hover": "#dadada",
+                        "pressed": "#ffffff",
+                    },
+                    borderRadius=10,
+                )
+            )

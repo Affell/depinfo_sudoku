@@ -163,7 +163,7 @@ def game_loop():
     )
 
     timer_button: Timer = Timer(
-        600,
+        100,
         50,
         screen,
         100,
@@ -216,9 +216,22 @@ def game_loop():
             timer_button.process()
 
             if board.error_count == 3:
+                timer_button.stop = True
                 board.show_error_message()
                 board.back_menu.process()
                 board.new_game.process()
+            
+            compteur = 0
+            for i in range (board.size):
+                for j in range (board.size):
+                    if board.tiles[i][j].value == board.solution[i][j]:
+                        compteur +=1
+            if compteur == board.size*board.size:
+                timer_button.stop = True
+                board.show_win_message()
+                board.back_menu.process()
+                board.new_game.process()
+                
 
         pygame.display.flip()
 
