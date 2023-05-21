@@ -27,6 +27,7 @@ class Board:
         self.bloc_size = int(self.size**0.5)
         self.cell_size = int(180 // self.bloc_size)
         self.board_size = int(self.size * self.cell_size)
+        self.current_tile = None
         self.offset = (
             int((1280 - self.board_size) / 2),
             int((720 - self.board_size) / 2),
@@ -112,6 +113,33 @@ class Board:
                 else:
                     self.tiles[i][j].background_color = "white"
         tile.selected = True
+        self.current_tile = tile
+
+    def move_tile(self,event):
+        if self.current_tile is None:
+            return
+        direction = None
+        if event.key == pygame.K_UP:
+            direction = "up"
+        if event.key == pygame.K_DOWN:
+            direction = "down"
+        if event.key == pygame.K_LEFT:
+            direction = "left"
+        if event.key == pygame.K_RIGHT:
+            direction = "right"
+        
+        x, y = self.current_tile.get_pos()
+        if direction == "up" and x > 0:
+            x -= 1
+        elif direction == "down" and x < self.size - 1:
+            x += 1
+        elif direction == "left" and y > 0:
+            y -= 1
+        elif direction == "right" and y < self.size - 1:
+            y += 1
+
+        self.select_tile(self.tiles[x][y])
+        
 
     def enter_char(self, char: str):
         if char not in algorithme.get_allowed_characters(self.size):

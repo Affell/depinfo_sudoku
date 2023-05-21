@@ -193,6 +193,8 @@ def game_loop():
                     board.enter_char(event.unicode.upper())
                 except ValueError as _:
                     pass
+            if event.type == pygame.KEYDOWN:
+                board.move_tile(event)
 
         if board is None:
             if not menu.is_enabled():
@@ -207,7 +209,7 @@ def game_loop():
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:
                     board.select_tile(tile)
-
+                    
             screen.fill("white")
             board.draw_board()
             note_button.fontColor = "green" if board.noteMode else "red"
