@@ -84,7 +84,7 @@ class Board:
         font = pygame.font.SysFont("arial", 20)
         text = font.render(f"Erreurs : {self.error_count}", True, "black")
         self.error_rect.blit(
-            text, text.get_rect(center=self.error_rect.get_rect().center)
+            text,text.get_rect(center=self.error_rect.get_rect().center)
         )
 
     def get_tile(self, x, y) -> Tile:
@@ -118,24 +118,14 @@ class Board:
     def move_tile(self,event):
         if self.current_tile is None:
             return
-        direction = None
-        if event.key == pygame.K_UP:
-            direction = "up"
-        if event.key == pygame.K_DOWN:
-            direction = "down"
-        if event.key == pygame.K_LEFT:
-            direction = "left"
-        if event.key == pygame.K_RIGHT:
-            direction = "right"
-        
         x, y = self.current_tile.get_pos()
-        if direction == "up" and x > 0:
+        if event.key == pygame.K_UP and x > 0:
             x -= 1
-        elif direction == "down" and x < self.size - 1:
+        elif event.key == pygame.K_DOWN and x < self.size - 1:
             x += 1
-        elif direction == "left" and y > 0:
+        elif event.key == pygame.K_LEFT and y > 0:
             y -= 1
-        elif direction == "right" and y < self.size - 1:
+        elif event.key == pygame.K_RIGHT and y < self.size - 1:
             y += 1
 
         self.select_tile(self.tiles[x][y])

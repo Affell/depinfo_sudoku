@@ -74,16 +74,21 @@ def menu_generate_grid(name, size, difficulty, screen, menu):
     else:
         print(f'La grille "{name}" existe déjà')
 
+def menu_solve_grid(name,screen):
+    return
 
 def build_menu(screen) -> tuple[pygame_menu.Menu]:
     menu = pygame_menu.Menu(
-        "Sudoku", 1280, 720, theme=pygame_menu.themes.THEME_DARK, columns=2, rows=2
+        "Sudoku", 1280, 720, theme=pygame_menu.themes.THEME_DARK, columns=2, rows=3
     )
     load_menu = pygame_menu.Menu(
         "Charger une grille", 1280, 720, theme=pygame_menu.themes.THEME_DARK
     )
     generate_menu = pygame_menu.Menu(
         "Nouvelle grille", 1280, 720, theme=pygame_menu.themes.THEME_DARK
+    )
+    solve_menu = pygame_menu.Menu(
+        "Résoud grille", 1280, 720, theme=pygame_menu.themes.THEME_DARK
     )
 
     for grid in list_grids():
@@ -114,11 +119,16 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
             generate_menu,
         ),
     )
+    for grid in list_grids():
+        solve_menu.add.button(
+            grid, lambda name : menu_solve_grid(name,screen), grid
+        )
 
     menu.add.button("Charger une grille", load_menu)
     menu.add.button("Nouvelle grille", generate_menu)
+    menu.add.button("Résoudre grille",solve_menu)
 
-    return menu, load_menu, generate_menu
+    return menu, load_menu, generate_menu, solve_menu
 
 
 def game_loop():
@@ -128,7 +138,7 @@ def game_loop():
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((1280, 720))
 
-    menu, load_menu, generate_menu = build_menu(screen)
+    menu, load_menu, generate_menu, solve_menu = build_menu(screen)
 
     def on_click():
         board.noteMode = not board.noteMode
@@ -173,7 +183,6 @@ def game_loop():
         fontSize= 30,
     )
     
-
     note_button.onclickFunction = on_click
 
     running = True
@@ -193,7 +202,7 @@ def game_loop():
                     board.enter_char(event.unicode.upper())
                 except ValueError as _:
                     pass
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and board is not None:
                 board.move_tile(event)
 
         if board is None:
@@ -216,7 +225,7 @@ def game_loop():
             note_button.process()
             back_home.process()
             timer_button.process()
-
+           
             if board.error_count == 3:
                 timer_button.stop = True
                 board.show_error_message()
