@@ -9,35 +9,35 @@ from timer import Timer
 class Board:
     def __init__(
         self,
-        name: str,
-        window: pygame.Surface,
-        matrix: np.ndarray,
-        progress: np.ndarray,
-        notes: np.ndarray,
-        noteMode,
-        errors: int,
-        solution: np.ndarray,
+        name: str, #Nom de la grille
+        window: pygame.Surface, #Paramètre spécifiant la surface d'affichage
+        matrix: np.ndarray, #Matrice numpy contenant la grille de sudoku 
+        progress: np.ndarray, #Matrice contenant les saisies du joueur
+        notes: np.ndarray, #Matrice contenant les notes prises par l'utilisateur
+        noteMode, #Paramètre vérifiant si le mode note est activé 
+        errors: int, #Compteur d'erreurs
+        solution: np.ndarray, #Matrice contenant la solution de la grille
     ):
-        self.timer = Timer
-        self.active = True
-        self.pause = False
-        self.name = name
-        self.init_board = np.array(matrix)
-        self.size = self.init_board.shape[0]
-        self.bloc_size = int(self.size**0.5)
-        self.cell_size = int(180 // self.bloc_size)
-        self.board_size = int(self.size * self.cell_size)
-        self.current_tile = None
+        self.timer = Timer #Durée de la partie
+        self.active = True #??
+        self.pause = False #??
+        self.name = name #Nom de la grille
+        self.init_board = np.array(matrix) #Grille de départ
+        self.size = self.init_board.shape[0] #Taille de la grille
+        self.bloc_size = int(self.size**0.5) #??
+        self.cell_size = int(180 // self.bloc_size) #Taille d'une case
+        self.board_size = int(self.size * self.cell_size) #??
+        self.current_tile = None #Case actuellement selectionnée
         self.offset = (
             int((1280 - self.board_size) / 2),
             int((720 - self.board_size) / 2),
-        )
-        self.error_count = errors
-        self.solution = np.array(solution)
-        self.screen = window
+        ) #Décalage permettant que la grille soit au milieu de l'écran
+        self.error_count = errors #Compteur d'erreurs
+        self.solution = np.array(solution) #Solution de la grille
+        self.screen = window #Surface d'affichage
         self.window = window.subsurface(
             pygame.Rect(*self.offset, self.board_size, self.board_size)
-        )
+        ) #Surface d'affichage
         self.tiles = [
             [
                 Tile(
@@ -54,11 +54,11 @@ class Board:
                 for j in range(self.size)
             ]
             for i in range(self.size)
-        ]
-        self.noteMode = noteMode
-        self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30))
-        self.back_menu = None
-        self.new_game = None
+        ] #Objet Tile qui contient toutes les cases de la grille
+        self.noteMode = noteMode #Paramètre vérifiant si le mode note est activé 
+        self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30)) #??
+        self.back_menu = None #Retour au menu
+        self.new_game = None #Nouvelle partie
 
     def draw_board(self):
         for i in range(self.size):
@@ -130,7 +130,7 @@ class Board:
 
         self.select_tile(self.tiles[x][y])
         
-
+          
     def enter_char(self, char: str):
         if char not in algorithme.get_allowed_characters(self.size):
             return

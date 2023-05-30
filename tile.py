@@ -4,25 +4,25 @@ import algorithme
 
 class Tile:
     def __init__(self, x, y, value, init_value, notes, valid, window, size, bloc_size):
-        self.x = x
-        self.y = y
-        self.value = value
-        self.init_value = init_value
-        self.notes = notes
-        self.valid = valid
-        self.window = window
-        self.size = size
-        self.bloc_size = bloc_size
-        self.rect = pygame.Rect(y, x, self.size, self.size)
-        self.background_color = "white"
-        self.selected = False
+        self.x = x #Position de la case en abscisse
+        self.y = y #Position de la case en ordonnée 
+        self.value = value #Contenu de la case ??
+        self.init_value = init_value #Contenu inital de la case ??
+        self.notes = notes #Contenu des notes ??
+        self.valid = valid #Paramètre vérifiant si la saise du joueur est valide
+        self.window = window #Paramètre spécifiant la surface d'affichage
+        self.size = size #Taille de la case
+        self.bloc_size = bloc_size #??
+        self.rect = pygame.Rect(y, x, self.size, self.size) #Taille de la grille de jeu ??
+        self.background_color = "white" #Couleur du fond
+        self.selected = False #Paramètre vérifiant si la case est saisie ou non
 
-    def draw(self):
+    def draw(self): #Dessine la surface de jeu ??
         surface: pygame.Surface = self.window.subsurface(self.rect)
         surface.fill(self.background_color)
         pygame.draw.rect(self.window, (0, 0, 0), self.rect, 1)
 
-    def display(self):
+    def display(self): #Affiche les cases et leurs contenu
         if self.value != "0":
             font = pygame.font.SysFont("arial", 80 - 10 * self.bloc_size)
             color = "red"
@@ -51,5 +51,5 @@ class Tile:
                 text = font.render(self.notes[i], True, (0, 0, 0))
                 self.window.blit(text, text.get_rect(center=pos))
 
-    def get_pos(self):
+    def get_pos(self): #Renvoie le position de la case
         return self.x // self.size, self.y // self.size
