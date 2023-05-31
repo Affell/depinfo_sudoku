@@ -13,6 +13,7 @@ def lecture_grille(name):
     note = False
     noteMode = False
     errors = 0
+    timer = 0
     for ligne in lignes:
         ligne = ligne.strip()
         if ligne.startswith("PROGRESS:"):
@@ -29,6 +30,8 @@ def lecture_grille(name):
                 noteMode = ligne[6:] == "True"
             except Exception:
                 continue
+        elif ligne.startswith("TIMER:"):
+            timer = int(ligne[6:])
         else:
             elements = ligne.split(",")
             if note:
@@ -47,6 +50,7 @@ def lecture_grille(name):
         notes,
         noteMode,
         errors,
+        timer
     )
 
 

@@ -5,7 +5,6 @@ import pygame
 import pygame_menu
 import os
 import threading
-from timer import Timer
 
 board: Board = None
 sizes = {"4x4": 4, "9x9": 9, "16x16": 16}
@@ -36,13 +35,13 @@ def list_grids() -> list[str]:
 
 
 def menu_load_grid(name, screen):
-    grid, progress, notes, noteMode, errors = algorithme.lecture_grille(name)
+    grid, progress, notes, noteMode, errors, elapsed_time = algorithme.lecture_grille(name)
     if algorithme.grille_valide(grid):
         solution = algorithme.resoud_grille(grid, 1)
         if len(solution) == 1:
             global board
             board = Board(
-                name, screen, grid, progress, notes, noteMode, errors, solution[0]
+                name, screen, grid, progress, notes, noteMode, errors, solution[0], elapsed_time
             )
         else:
             print(f'Aucune solution n\'a pu être trouvée pour la grille "{name}"')
@@ -62,6 +61,7 @@ def menu_generate_grid(name, size, difficulty, screen, menu):
             grid, solution = algorithme.genere_grille(
                 difficulties[size][difficulty], sizes[size], progress_bar
             )
+            menu.remove_widget(progress_bar)
             global board
             board = Board(name, screen, grid, grid, [], False, 0, solution)
             board.save()
@@ -74,8 +74,19 @@ def menu_generate_grid(name, size, difficulty, screen, menu):
     else:
         print(f'La grille "{name}" existe déjà')
 
-def menu_solve_grid(name,screen):
-    return
+def menu_solve_grid(name, screen):
+    grid, _, _, _, _, _ = algorithme.lecture_grille(name)
+    if algorithme.grille_valide(grid):
+        solution = algorithme.resoud_grille(grid, 1)
+        if len(solution) == 1:
+            global board
+            board = Board(
+                name, screen, solution[0], solution[0], [], False, 0, solution[0], play=False
+            )
+        else:
+            print(f'Aucune solution n\'a pu être trouvée pour la grille "{name}"')
+    else:
+        print(f'La grille "{name}" est invalide')
 
 def build_menu(screen) -> tuple[pygame_menu.Menu]:
     menu = pygame_menu.Menu(
@@ -94,6 +105,9 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
     for grid in list_grids():
         btn = load_menu.add.button(
             grid, lambda name: menu_load_grid(name, screen), grid
+        )
+        solve_menu.add.button(
+            grid, lambda name : menu_solve_grid(name, screen), grid
         )
 
     name_input = generate_menu.add.text_input("Nom : ")
@@ -119,14 +133,9 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
             generate_menu,
         ),
     )
-    for grid in list_grids():
-        solve_menu.add.button(
-            grid, lambda name : menu_solve_grid(name,screen), grid
-        )
-
     menu.add.button("Charger une grille", load_menu)
     menu.add.button("Nouvelle grille", generate_menu)
-    menu.add.button("Résoudre grille",solve_menu)
+    menu.add.button("Résoudre grille", solve_menu)
 
     return menu, load_menu, generate_menu, solve_menu
 
@@ -139,51 +148,6 @@ def game_loop():
     screen = pygame.display.set_mode((1280, 720))
 
     menu, load_menu, generate_menu, solve_menu = build_menu(screen)
-
-    def on_click():
-        board.noteMode = not board.noteMode
-
-    note_button: Button = Button(
-        1000,
-        90,
-        screen,
-        100,
-        100,
-        "red",
-        buttonText="Note",
-        onclickFunction=on_click,
-        image="./resources/note-button.png",
-        imageOffset=(-32, -50),
-        textOffset=(0, 30),
-    )
-
-    def back_menu_f():
-        board.active = False
-
-    back_home: Button = Button(
-        1000,
-        200,
-        screen,
-        100,
-        100,
-        "black",
-        buttonText="Accueil",
-        fontSize=20,
-        onclickFunction=back_menu_f,
-    )
-
-    timer_button: Timer = Timer(
-        100,
-        50,
-        screen,
-        100,
-        50,
-        "black",
-        buttonText="Timer",
-        fontSize= 30,
-    )
-    
-    note_button.onclickFunction = on_click
 
     running = True
     while running:
@@ -218,31 +182,9 @@ def game_loop():
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:
                     board.select_tile(tile)
-                    
+
             screen.fill("white")
             board.draw_board()
-            note_button.fontColor = "green" if board.noteMode else "red"
-            note_button.process()
-            back_home.process()
-            timer_button.process()
-           
-            if board.error_count == 3:
-                timer_button.stop = True
-                board.show_error_message()
-                board.back_menu.process()
-                board.new_game.process()
-            
-            compteur = 0
-            for i in range (board.size):
-                for j in range (board.size):
-                    if board.tiles[i][j].value == board.solution[i][j]:
-                        compteur +=1
-            if compteur == board.size*board.size:
-                timer_button.stop = True
-                board.show_win_message()
-                board.back_menu.process()
-                board.new_game.process()
-                
 
         pygame.display.flip()
 
