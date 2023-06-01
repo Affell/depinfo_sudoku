@@ -4,27 +4,27 @@ import algorithme
 
 class Tile:
     def __init__(self, x, y, value, init_value, notes, valid, window, size, bloc_size):
-        self.x = x #Position de la case en abscisse
-        self.y = y #Position de la case en ordonnée 
-        self.value = value #Contenu de la case ??
-        self.init_value = init_value #Contenu inital de la case ??
-        self.notes = notes #Contenu des notes ??
-        self.valid = valid #Paramètre vérifiant si la saise du joueur est valide
-        self.window = window #Paramètre spécifiant la surface d'affichage
-        self.size = size #Taille de la case
-        self.bloc_size = bloc_size #??
-        self.rect = pygame.Rect(y, x, self.size, self.size) #Taille de la grille de jeu ??
-        self.background_color = "white" #Couleur du fond
-        self.selected = False #Paramètre vérifiant si la case est saisie ou non
+        self.x = x  # Position de la case en abscisse
+        self.y = y  # Position de la case en ordonnée
+        self.value = value  # Caractère contenu de la case
+        self.init_value = init_value  # Contenu inital de la case
+        self.notes = notes  # Contenu des notes
+        self.valid = valid  # Paramètre vérifiant si la saise du joueur est valide
+        self.window = window  # Paramètre spécifiant la surface d'affichage
+        self.size = size  # Taille de la case
+        self.bloc_size = bloc_size  # Taille des sections de la grille
+        self.rect = pygame.Rect(y, x, self.size, self.size)  # Rectangle pygame correspondant à cette case
+        self.background_color = "white"  # Couleur du fond
+        self.selected = False  # Paramètre vérifiant si la case est saisie ou non
 
-    def draw(self): #Dessine la surface de jeu ??
+    def draw(self):  # Dessine la case
         surface: pygame.Surface = self.window.subsurface(self.rect)
         surface.fill(self.background_color)
-        pygame.draw.rect(self.window, (0, 0, 0), self.rect, 1)
+        pygame.draw.rect(self.window, (200, 200, 200), self.rect, 1)
 
-    def display(self): #Affiche les cases et leurs contenu
+    def display(self):  # Affiche le contenu de la case
         if self.value != "0":
-            font = pygame.font.SysFont("arial", 80 - 10 * self.bloc_size)
+            font = pygame.font.SysFont("Source Sans Pro", 80 - 10 * self.bloc_size)
             color = "red"
             if self.init_value == "0" and self.valid:
                 color = "blue"
@@ -33,7 +33,7 @@ class Tile:
             text = font.render(self.value, True, color)
             self.window.blit(text, text.get_rect(center=self.rect.center))
         elif len(self.notes) > 0:
-            font = pygame.font.SysFont("arial", 24 - 3 * self.bloc_size)
+            font = pygame.font.SysFont("Source Sans Pro", 24 - 3 * self.bloc_size)
             w, h = font.size(self.notes[0])
             for i in range(len(self.notes)):
                 pos = (
@@ -51,5 +51,5 @@ class Tile:
                 text = font.render(self.notes[i], True, (0, 0, 0))
                 self.window.blit(text, text.get_rect(center=pos))
 
-    def get_pos(self): #Renvoie le position de la case
+    def get_pos(self):  # Renvoie lq position de la case
         return self.x // self.size, self.y // self.size

@@ -101,13 +101,7 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
         "Résoud grille", 1280, 720, theme=pygame_menu.themes.THEME_DARK
     )
 
-    for grid in list_grids():
-        load_menu.add.button(
-            grid, lambda name: menu_load_grid(name, screen), grid
-        )
-        solve_menu.add.button(
-            grid, lambda name : menu_solve_grid(name, screen), grid
-        )
+    update_menu_grids(screen, load_menu, solve_menu)
 
     name_input = generate_menu.add.text_input("Nom : ")
     size_selector = generate_menu.add.selector(
@@ -138,6 +132,17 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
 
     return menu, load_menu, generate_menu, solve_menu
 
+
+def update_menu_grids(screen, load_menu, solve_menu):
+    load_menu.clear(False)
+    solve_menu.clear(False)
+    for grid in list_grids():
+        load_menu.add.button(
+            grid, lambda name: menu_load_grid(name, screen), grid
+        )
+        solve_menu.add.button(
+            grid, lambda name : menu_solve_grid(name, screen), grid
+        )
 
 def game_loop():
 
@@ -170,7 +175,7 @@ def game_loop():
 
         if board is None:
             if not menu.is_enabled():
-                menu, load_menu, generate_menu, solve_menu = build_menu(screen)
+                update_menu_grids(screen, load_menu, solve_menu)
                 menu.enable()
             menu.update(events)
             menu.draw(screen)
@@ -178,6 +183,7 @@ def game_loop():
             if menu.is_enabled():
                 menu.disable()
                 menu.full_reset()
+                board.menus = (menu, load_menu, generate_menu, solve_menu)
             if not board.pause and pygame.mouse.get_pressed() == (1, 0, 0):
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:

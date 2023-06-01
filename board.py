@@ -18,7 +18,8 @@ class Board:
         errors: int,  # Compteur d'erreurs
         solution: np.ndarray,  # Matrice contenant la solution de la grille
         elapsed_time: int = 0,
-        play=True
+        play=True,
+        font="Source Sans Pro"
     ):
         self.active = True  # Si cet objet board est actif, il va être affiché à l'écran
         self.pause = False  # Mode pause pour arrêter le timer
@@ -61,6 +62,8 @@ class Board:
         self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30))  # Surface d'affichage du nombre d'erreurs
         self.back_menu = None  # Retour au menu
         self.new_game = None  # Nouvelle partie
+        self.menus = None  # Tuple des menus de l'application
+        self.font = font
         self.create_buttons(elapsed_time)
 
     def is_running(self):
@@ -71,20 +74,20 @@ class Board:
             for j in range(self.size):
                 self.tiles[i][j].draw()
                 self.tiles[i][j].display()
-        for i in range(1, int(self.bloc_size) + 1):
+        for i in range(1, int(self.bloc_size)):
             pygame.draw.line(
                 self.window,
                 (0, 0, 0),
                 (i * self.cell_size * self.bloc_size, 0),
                 (i * self.cell_size * self.bloc_size, self.board_size),
-                5,
+                3,
             )
             pygame.draw.line(
                 self.window,
                 (0, 0, 0),
                 (0, i * self.cell_size * self.bloc_size),
                 (self.board_size, i * self.cell_size * self.bloc_size),
-                5,
+                3,
             )
 
         font = pygame.font.SysFont("arial", 20)
@@ -96,11 +99,12 @@ class Board:
         self.note_button.process()
         self.back_home.process()
         self.timer_button.process()
+        self.pause_button.process()
 
         if self.play:
             if self.error_count == 3:
                 self.timer_button.stop = True
-                self.show_error_message()
+                self.popup("Vous avez fait trop d'erreurs")
                 self.back_menu.process()
                 self.new_game.process()
 
@@ -111,7 +115,7 @@ class Board:
                         compteur += 1
             self.timer_button.stop = not self.is_running() or compteur == self.size * self.size
             if compteur == self.size * self.size:
-                self.show_win_message()
+                self.popup("Vous avez gagné")
                 self.back_menu.process()
                 self.new_game.process()
 
@@ -159,7 +163,7 @@ class Board:
         self.select_tile(self.tiles[x][y])
 
     def enter_char(self, char: str):
-        if self.play:
+        if self.is_running():
             if char not in algorithme.get_allowed_characters(self.size):
                 return
             for i in range(self.size):
@@ -250,7 +254,21 @@ class Board:
             stop=not self.is_running()
         )
 
-    def show_error_message(self):
+        def pause_f():
+            self.pause = not self.pause
+
+        self.pause_button: Button = Button(
+            100,
+            110,
+            self.screen,
+            100,
+            50,
+            "black",
+            buttonText="Pause",
+            onclickFunction=pause_f
+        )
+
+    def popup(self, message):
         self.pause = True
 
         gray_surface = pygame.Surface(
@@ -271,7 +289,7 @@ class Board:
         font = pygame.font.SysFont("arial", 30)
         font2 = pygame.font.SysFont("arial", 20)
         text = font.render("Partie terminée", True, (0, 0, 0))
-        text2 = font2.render("Vous avez fait trop d'erreur", True, (186, 186, 186))
+        text2 = font2.render(message, True, (186, 186, 186))
 
         text_rect = text.get_rect(center=message_rect.center)
         text_rect = text_rect.move(0, -35)
@@ -283,6 +301,7 @@ class Board:
         def back_menu_f():
             self.save()
             self.active = False
+            self.menus[0]._open(self.menus[2])
 
         self.back_menu: Button = (
             self.back_menu
@@ -306,83 +325,9 @@ class Board:
             )
         )
 
-        self.new_game: Button = (
-            self.new_game
-            if self.new_game is not None
-            else Button(
-                message_rect.right - 195,
-                message_rect.bottom - 80,
-                self.screen,
-                145,
-                40,
-                "black",
-                buttonText="Nouvelle partie",
-                fontSize=20,
-                onclickFunction=back_menu_f,
-                fillColors={
-                    "normal": "#ffffff",
-                    "hover": "#dadada",
-                    "pressed": "#ffffff",
-                },
-                borderRadius=10,
-            )
-        )
-
-    def show_win_message(self):
-        self.pause = True
-
-        gray_surface = pygame.Surface(
-            (self.screen.get_width(), self.screen.get_height())
-        )
-        gray_surface.set_alpha(200)
-        gray_surface.fill((0, 0, 0))
-        self.screen.blit(gray_surface, (0, 0))
-
-        message_rect = pygame.Rect(
-            self.screen.get_width() // 2 - 200,
-            self.screen.get_height() // 2 - 100,
-            400,
-            200,
-        )
-        pygame.draw.rect(self.screen, (250, 250, 250), message_rect, border_radius=20)
-
-        font = pygame.font.SysFont("arial", 30)
-        font2 = pygame.font.SysFont("arial", 20)
-        text = font.render("Partie terminée", True, (0, 0, 0))
-        text2 = font2.render("Vous avez gagné", True, (186, 186, 186))
-
-        text_rect = text.get_rect(center=message_rect.center)
-        text_rect = text_rect.move(0, -35)
-        self.screen.blit(text, text_rect)
-        text_rect = text.get_rect(center=message_rect.center)
-        text_rect = text_rect.move(20, 5)
-        self.screen.blit(text2, text_rect)
-
-        def back_menu_f():
+        def generate_menu_f():
             self.save()
             self.active = False
-
-        self.back_menu: Button = (
-            self.back_menu
-            if self.back_menu is not None
-            else Button(
-                message_rect.left + 45,
-                message_rect.bottom - 80,
-                self.screen,
-                155,
-                40,
-                "white",
-                buttonText="Retour à l'accueil",
-                fontSize=20,
-                onclickFunction=back_menu_f,
-                fillColors={
-                    "normal": "#0048f9",
-                    "hover": "#666666",
-                    "pressed": "#0093f9",
-                },
-                borderRadius=10,
-            )
-        )
 
         self.new_game: Button = (
             self.new_game
