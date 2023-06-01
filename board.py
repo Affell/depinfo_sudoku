@@ -243,7 +243,7 @@ class Board:
             100,
             50,
             "black",
-            buttonText="Timer",
+            buttonText="",
             fontSize=30,
             start_time=pygame.time.get_ticks(),
             elapsed_time=elapsed_time,

@@ -1,5 +1,4 @@
 from board import Board
-from button import Button
 import algorithme
 import pygame
 import pygame_menu
@@ -103,7 +102,7 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
     )
 
     for grid in list_grids():
-        btn = load_menu.add.button(
+        load_menu.add.button(
             grid, lambda name: menu_load_grid(name, screen), grid
         )
         solve_menu.add.button(
@@ -171,6 +170,7 @@ def game_loop():
 
         if board is None:
             if not menu.is_enabled():
+                menu, load_menu, generate_menu, solve_menu = build_menu(screen)
                 menu.enable()
             menu.update(events)
             menu.draw(screen)
