@@ -4,19 +4,19 @@ import pygame
 class Timer:
     def __init__(
         self,
-        x,
-        y,
-        window,
-        width,
-        height,
-        fontColor,
-        buttonText="Button",
-        fontSize=40,
-        start_time=None ,
-        elapsed_time=0,
+        x, # Position de la case en abscisse
+        y, # Position de la case en ordonnée
+        window, # Paramètre spécifiant la surface d'affichage
+        width, # Largeur du timer
+        height, # Hauteur du timer
+        fontColor, # Couleur de la police d'écriture
+        buttonText="Button", # Texte affiché sur le timer
+        fontSize=40, # Taille de la police d'écriture
+        start_time=None , # Temps auquel le timer est démarré
+        elapsed_time=0, # Temps écoulé depuis le lancement du programme
         minutes=0,
         seconds=0,
-        stop=False,
+        stop=False, # Vérifie la marche ou non du timer
     ):
         self.x = x
         self.y = y
@@ -27,15 +27,15 @@ class Timer:
         self.buttonText = buttonText
         self.fontSize = fontSize
         self.start_time = (start_time if start_time is not None else pygame.time.get_ticks()) - elapsed_time
-        self.last_update = start_time
+        self.last_update = start_time 
         self.elapsed_time = elapsed_time
-        self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.font = pygame.font.SysFont("Arial", self.fontSize)
+        self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)  # Rectangle pygame correspondant au timer
+        self.font = pygame.font.SysFont("Arial", self.fontSize) # Police d'éciture
         self.minutes = minutes
         self.seconds = seconds
         self.stop = stop
 
-    def process(self):
+    def process(self): # Fonction qui permet de créer le timer
         if not self.stop:
             self.elapsed_time += pygame.time.get_ticks() - self.last_update
         self.minutes = self.elapsed_time // 60000
