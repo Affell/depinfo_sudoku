@@ -181,7 +181,9 @@ def game_loop():  # Boucle du jeu
                 menu.disable()
                 menu.full_reset()
                 board.menus = (menu, load_menu, generate_menu, solve_menu)
-            if not board.pause and pygame.mouse.get_pressed() == (1, 0, 0):
+            if board.pause_lock and not board.pause and pygame.mouse.get_pressed()[0] == 0:
+                board.pause_lock = False
+            if not board.pause and not board.pause_lock and pygame.mouse.get_pressed() == (1, 0, 0):
                 tile = board.get_tile(*pygame.mouse.get_pos())
                 if tile is not None:
                     board.select_tile(tile)

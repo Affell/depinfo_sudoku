@@ -67,6 +67,7 @@ class Board:
         self.menus = None  # Tuple des menus de l'application
         self.font = font
         self.create_buttons(elapsed_time)
+        self.pause_lock = False
 
     def is_running(self):  # Indique si une partie est en cours ou non
         return self.play and self.active and not self.pause
@@ -103,6 +104,7 @@ class Board:
         self.back_home.process()
         self.timer_button.process()
         self.pause_button.process()
+        self.big_play_button.process()
 
         if self.play:
             if self.error_count == 3:
@@ -130,24 +132,25 @@ class Board:
         return None
 
     def select_tile(self, tile: Tile):  # Permet de sélectionner une case spécifique
-        pos = tile.get_pos()
+        pos = tile.get_pos() if tile is not None else (-1, -1)
         for i in range(self.size):
             for j in range(self.size):
                 self.tiles[i][j].selected = False
-                if (self.tiles[i][j].value != "0" or (i, j) == pos) and self.tiles[i][
-                    j
-                ].value == tile.value:
-                    self.tiles[i][j].background_color = "green"
-                elif (
-                    i == pos[0]
-                    or j == pos[1]
-                    or (i // self.bloc_size, j // self.bloc_size)
-                    == (pos[0] // self.bloc_size, pos[1] // self.bloc_size)
-                ):
-                    self.tiles[i][j].background_color = "gray"
-                else:
-                    self.tiles[i][j].background_color = "white"
-        tile.selected = True
+                self.tiles[i][j].background_color = "white"
+                if tile is not None:
+                    if (self.tiles[i][j].value != "0" or (i, j) == pos) and self.tiles[i][
+                        j
+                    ].value == tile.value:
+                        self.tiles[i][j].background_color = "green"
+                    elif (
+                        i == pos[0]
+                        or j == pos[1]
+                        or (i // self.bloc_size, j // self.bloc_size)
+                        == (pos[0] // self.bloc_size, pos[1] // self.bloc_size)
+                    ):
+                        self.tiles[i][j].background_color = "gray"
+        if tile is not None:
+            tile.selected = True
         self.current_tile = tile
 
     def move_tile(self, event):  # Permet de sélectionner des cases avec les flèches directionnelles
@@ -216,8 +219,9 @@ class Board:
 
     def create_buttons(self, elapsed_time):  # Permet de créer les boutons sur le plateau de jeu
         def note_btn_f():
-            self.noteMode = not self.noteMode
-            self.note_button.image = pygame.image.load("./resources/note-button-" + ("on" if self.noteMode else "off") + ".png")
+            if self.play:
+                self.noteMode = not self.noteMode
+                self.note_button.image = pygame.image.load("./resources/note-button-" + ("on" if self.noteMode else "off") + ".png")
 
         self.note_button: Button = Button(
             1070,
@@ -239,7 +243,7 @@ class Board:
         )
 
         def back_board_f():
-            if len(self.history) > 1:
+            if self.play and len(self.history) > 1:
                 self.history.pop(-1)
                 self.tiles = self.history[-1]
 
@@ -293,8 +297,13 @@ class Board:
         )
 
         def pause_f():
-            self.pause = not self.pause
-            self.pause_button.image = pygame.image.load("./resources/" + ("play" if self.pause else "pause") + "-button.png")
+            if self.play:
+                if self.pause:
+                    self.pause_lock = True
+                self.pause = not self.pause
+                self.pause_button.image = pygame.image.load("./resources/" + ("play" if self.pause else "pause") + "-button.png")
+                self.big_play_button.visible = self.pause
+                self.select_tile(None)
 
         self.pause_button: Button = Button(
             130,
@@ -306,6 +315,24 @@ class Board:
             buttonText=None,
             image="./resources/pause-button.png",
             onclickFunction=pause_f
+        )
+
+        self.big_play_button: Button = Button(
+            self.offset[0] + self.board_size // 2 - 64,
+            self.offset[1] + self.board_size // 2 - 64,
+            self.screen,
+            128,
+            128,
+            "black",
+            buttonText=None,
+            image="./resources/play.png",
+            fillColors={
+                "normal": None,
+                "hover": None,
+                "pressed": None
+            },
+            onclickFunction=pause_f,
+            visible=False
         )
 
     def popup(self, message):  # Affiche des messages contextuels
@@ -341,7 +368,6 @@ class Board:
         def back_menu_f():
             self.save()
             self.active = False
-            self.menus[0]._open(self.menus[2])
 
         self.back_menu: Button = (
             self.back_menu
@@ -368,6 +394,7 @@ class Board:
         def generate_menu_f():
             self.save()
             self.active = False
+            self.menus[0]._open(self.menus[2])
 
         self.new_game: Button = (
             self.new_game
@@ -381,7 +408,7 @@ class Board:
                 "black",
                 buttonText="Nouvelle partie",
                 fontSize=20,
-                onclickFunction=back_menu_f,
+                onclickFunction=generate_menu_f,
                 fillColors={
                     "normal": "#ffffff",
                     "hover": "#dadada",
