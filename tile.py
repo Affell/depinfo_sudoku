@@ -53,3 +53,6 @@ class Tile:
 
     def get_pos(self):  # Renvoie lq position de la case
         return self.x // self.size, self.y // self.size
+
+    def clone(self):
+        return Tile(self.x, self.y, self.value, self.init_value, list(self.notes), self.valid, self.window, self.size, self.bloc_size)

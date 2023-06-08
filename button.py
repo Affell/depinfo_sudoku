@@ -9,7 +9,7 @@ class Button:
         window,
         width,
         height,
-        fontColor,
+        fontColor="black",
         buttonText="Button",
         fontSize=40,
         onclickFunction=None,
@@ -50,6 +50,7 @@ class Button:
         color = "normal"
         if self.buttonRect.collidepoint(mousePos):
             color = "hover"
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             if pygame.mouse.get_pressed(num_buttons=3)[0]:
                 color = "pressed"
                 if self.onePress:
@@ -65,21 +66,21 @@ class Button:
             self.buttonRect,
             border_radius=self.borderRadius,
         )
-        text = self.font.render(self.buttonText, True, self.fontColor)
-        self.window.blit(
-            text,
-            text.get_rect(
-                center=(
-                    self.buttonRect.center[0] + self.textOffset[0],
-                    self.buttonRect.center[1] + self.textOffset[1],
-                )
-            ),
-        )
+        if self.buttonText is not None:
+            text = self.font.render(self.buttonText, True, self.fontColor)
+            self.window.blit(
+                text,
+                text.get_rect(
+                    center=(
+                        self.buttonRect.center[0] + self.textOffset[0],
+                        self.buttonRect.center[1] + self.textOffset[1],
+                    )
+                ),
+            )
         if self.image is not None:
             self.window.blit(
                 self.image,
-                (
-                    self.buttonRect.center[0] + self.imageOffset[0],
-                    self.buttonRect.center[1] + self.imageOffset[1],
+                self.image.get_rect(
+                    center=(self.buttonRect.center[0] + self.imageOffset[0], self.buttonRect.center[1] + self.imageOffset[1])
                 ),
             )

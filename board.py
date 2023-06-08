@@ -58,8 +58,10 @@ class Board:
             ]
             for i in range(self.size)
         ]  # Objet Tile qui contient toutes les cases de la grille
+        self.history = []  # Tableau de l'historique du tableau
+        self.history.append(self.tiles)
         self.noteMode = noteMode  # Paramètre vérifiant si le mode note est activé
-        self.error_rect = window.subsurface(pygame.Rect(950, 50, 200, 30))  # Surface d'affichage du nombre d'erreurs
+        self.error_rect = window.subsurface(pygame.Rect(45, 150, 200, 30))  # Surface d'affichage du nombre d'erreurs
         self.back_menu = None  # Retour au menu
         self.new_game = None  # Nouvelle partie
         self.menus = None  # Tuple des menus de l'application
@@ -91,12 +93,13 @@ class Board:
             )
 
         font = pygame.font.SysFont("arial", 20)
-        text = font.render(f"Erreurs : {self.error_count}", True, "black")
+        text = font.render(f"Erreurs : {self.error_count}/3", True, "black")
         self.error_rect.blit(
             text, text.get_rect(center=self.error_rect.get_rect().center)
         )
-        self.note_button.fontColor = "green" if self.noteMode else "red"
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         self.note_button.process()
+        self.back_button.process()
         self.back_home.process()
         self.timer_button.process()
         self.pause_button.process()
@@ -169,6 +172,8 @@ class Board:
             for i in range(self.size):
                 for j in range(self.size):
                     if self.tiles[i][j].selected and self.init_board[i][j] == "0":
+                        temp = [[t.clone() for t in self.tiles[i]] for i in range(len(self.tiles))]
+                        self.tiles = temp
                         if self.noteMode:
                             if char != "0":
                                 self.tiles[i][j].value = "0"
@@ -185,7 +190,10 @@ class Board:
                                 self.tiles[i][j].valid = False
                                 self.error_count += 1 if char != "0" else 0
                             self.select_tile(self.tiles[i][j])
-                        break
+                        else:
+                            return
+                        self.history.append(temp)
+                        return
 
     def save(self):
         with open(f"./grids/{self.name}.sudoku", "w") as f:
@@ -194,7 +202,7 @@ class Board:
             )
             f.write(f"PROGRESS:{self.error_count}\n")
             f.writelines(
-                [",".join([tile.value for tile in line]) + "\n" for line in self.tiles]
+                [",".join([tile.value for tile in line]) + "\n" for line in self.history[-1]]
             )
             f.write(f"NOTES:{self.noteMode}\n")
             f.writelines(
@@ -207,21 +215,51 @@ class Board:
             f.write(f"TIMER:{self.timer_button.elapsed_time}\n")
 
     def create_buttons(self, elapsed_time):
-        def on_click():
+        def note_btn_f():
             self.noteMode = not self.noteMode
+            self.note_button.image = pygame.image.load("./resources/note-button-" + ("on" if self.noteMode else "off") + ".png")
 
         self.note_button: Button = Button(
-            1000,
+            1070,
             90,
             self.screen,
-            100,
-            100,
-            "red",
+            70,
+            70,
+            fontColor="#147DE6",
+            fontSize=20,
             buttonText="Note",
-            onclickFunction=on_click,
-            image="./resources/note-button.png",
-            imageOffset=(-32, -50),
-            textOffset=(0, 30),
+            onclickFunction=note_btn_f,
+            image="./resources/note-button-" + ("on" if self.noteMode else "off") + ".png",
+            fillColors={
+                "normal": "#ffffff",
+                "hover": "#ffffff",
+                "pressed": "#ffffff",
+            },
+            textOffset=(-10, 50)
+        )
+
+        def back_board_f():
+            if len(self.history) > 1:
+                self.history.pop(-1)
+                self.tiles = self.history[-1]
+
+        self.back_button: Button = Button(
+            1170,
+            90,
+            self.screen,
+            70,
+            70,
+            fontColor="#147DE6",
+            fontSize=20,
+            buttonText="Retour",
+            onclickFunction=back_board_f,
+            image="./resources/back.png",
+            fillColors={
+                "normal": "#ffffff",
+                "hover": "#ffffff",
+                "pressed": "#ffffff",
+            },
+            textOffset=(0, 51)
         )
 
         def back_menu_f():
@@ -229,13 +267,13 @@ class Board:
             self.active = False
 
         self.back_home: Button = Button(
-            1000,
-            200,
+            1050,
+            30,
             self.screen,
-            100,
-            100,
-            "black",
-            buttonText="Accueil",
+            200,
+            30,
+            "#147DE6",
+            buttonText="Retour au menu principal",
             fontSize=20,
             onclickFunction=back_menu_f,
         )
@@ -256,15 +294,17 @@ class Board:
 
         def pause_f():
             self.pause = not self.pause
+            self.pause_button.image = pygame.image.load("./resources/" + ("play" if self.pause else "pause") + "-button.png")
 
         self.pause_button: Button = Button(
+            130,
             100,
-            110,
             self.screen,
-            100,
-            50,
+            32,
+            32,
             "black",
-            buttonText="Pause",
+            buttonText=None,
+            image="./resources/pause-button.png",
             onclickFunction=pause_f
         )
 
