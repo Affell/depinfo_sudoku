@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 
-def lecture_grille(name): # Lecture de la grille à partir du fichier
+def lecture_grille(name):  # Lecture de la grille à partir du fichier
     with open(f"./grids/{name}.sudoku", "r") as f:
         lignes = f.readlines()
 
@@ -54,17 +54,17 @@ def lecture_grille(name): # Lecture de la grille à partir du fichier
     )
 
 
-def get_allowed_characters(taille, zeros=True): # Fonction vérifiant la validité des caractères dans la grille
+def get_allowed_characters(taille, zeros=True):  # Fonction vérifiant la validité des caractères dans la grille
     return (["0"] if zeros else []) + (
         [str(i) for i in range(1, 10)] + [chr(i) for i in range(65, 91)]
     )[:taille]
 
 
-def get_character_index(char): # Fonction qui renvoie l'indice d'un caractère ??
+def get_character_index(char):  # Fonction qui renvoie l'indice d'un caractère ??
     return ord(char) - 49 if 49 <= ord(char) <= 57 else ord(char) - 56
 
 
-def grille_valide(grille_jeu): # Vérifie de la validité de la grille(on peut ajouter d'autres vérifications)
+def grille_valide(grille_jeu):  # Vérifie de la validité de la grille(on peut ajouter d'autres vérifications)
     for ligne in grille_jeu:
         liste = [e for e in ligne if e != "0"]
         if len(set(liste)) != (len(liste)):
@@ -73,7 +73,7 @@ def grille_valide(grille_jeu): # Vérifie de la validité de la grille(on peut a
     return True
 
 
-def saisie_valide(grille, char, pos): # Vérification de la validité d'une saisie dans la grille (si il n'y a pas de contradiction avec les règles du Sudoku)
+def saisie_valide(grille, char, pos):  # Vérification de la validité d'une saisie dans la grille (si il n'y a pas de contradiction avec les règles du Sudoku)
 
     n = len(grille[0])
     m = int((n**0.5))
@@ -96,7 +96,7 @@ def saisie_valide(grille, char, pos): # Vérification de la validité d'une sais
     return True
 
 
-def get_possibilities(grille, chars, randomMode): # Renvoie les possibilités pour chaque case et celle en ayant le moins
+def get_possibilities(grille, chars, randomMode):  # Renvoie les possibilités pour chaque case et celle en ayant le moins
     p = [[[] for _ in range(len(grille[i]))] for i in range(len(grille))]
     x, y = None, None
     for i in range(len(grille)):
@@ -112,7 +112,7 @@ def get_possibilities(grille, chars, randomMode): # Renvoie les possibilités po
     return p, (x, y)
 
 
-def get_next_case(grille, possibilities): # Renvoie les coordonnées de la prochaine case à remplir
+def get_next_case(grille, possibilities):  # Renvoie les coordonnées de la prochaine case à remplir
     x, y = None, None
     for i in range(len(possibilities)):
         for j in range(len(possibilities[0])):
@@ -123,7 +123,7 @@ def get_next_case(grille, possibilities): # Renvoie les coordonnées de la proch
     return x, y
 
 
-def update_possibilities(possibilities, case, char): # Met à jour les possibilités de chaque case
+def update_possibilities(possibilities, case, char):  # Met à jour les possibilités de chaque case
     new = [
         [[] for _ in range(len(possibilities[i]))] for i in range(len(possibilities))
     ]
@@ -148,13 +148,13 @@ def update_possibilities(possibilities, case, char): # Met à jour les possibili
     return new
 
 
-def resoud_grille(grille, limit=1, randomMode=False): # Résoud une grille avec un nombre max de solutions à trouver
+def resoud_grille(grille, limit=1, randomMode=False):  # Résoud une grille avec un nombre max de solutions à trouver
     return __resoud_grille(
         np.array(grille), get_allowed_characters(len(grille), False), limit, randomMode
     )
 
 
-def __resoud_grille(grille, chars, limit, randomMode, possibilities=None): # Backtracking pour résoudre une grille rentrée en paramètre
+def __resoud_grille(grille, chars, limit, randomMode, possibilities=None):  # Backtracking pour résoudre une grille rentrée en paramètre
     solutions = []
     if possibilities is None:
         possibilities, nextCase = get_possibilities(grille, chars, randomMode)
@@ -178,7 +178,7 @@ def __resoud_grille(grille, chars, limit, randomMode, possibilities=None): # Bac
     return solutions
 
 
-def genere_grille(nb, taille, progress_bar=None): # Génère une grille aléatoire
+def genere_grille(nb, taille, progress_bar=None):  # Génère une grille aléatoire
     solution = resoud_grille(np.full((taille, taille), "0", dtype=str), 1, True)[0]
     grille = np.array(solution)
 
