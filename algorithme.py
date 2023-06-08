@@ -183,19 +183,32 @@ def genere_grille(nb, taille, progress_bar=None):  # Génère une grille aléato
     grille = np.array(solution)
 
     cases = [(i, j) for i in range(taille) for j in range(taille)]
-    random.shuffle(cases)
     nb_operations = len(cases) - nb
-    for k in range(1, nb_operations + 1):
-        temp = np.array(grille)
-        (i, j) = None, None
-        while (i, j) == (None, None) or len(resoud_grille(temp, limit=2)) > 1:
-            if len(cases) == 0:
-                return None, solution
-            if (i, j) != (None, None):
-                temp[i][j] = grille[i][j]
-            i, j = cases.pop()
-            temp[i][j] = 0
-        grille[i][j] = 0
+    g = __genere_grille(grille, taille, 0, nb_operations, cases, progress_bar)
+    return g, solution
+
+
+def __genere_grille(grille, taille, nb, nb_operations, cases=None, progress_bar=None):
+    if cases is None:
+        cases = [(i, j) for i in range(taille) for j in range(taille)]
+    else:
+        cases = [tuple(t) for t in cases]
+    if nb == nb_operations:
+        return grille
+    if len(cases) == 0:
+        return None
+    random.shuffle(cases)
+
+    temp = np.array(grille)
+    for (i, j) in cases:
         if progress_bar is not None:
-            progress_bar.set_value(k / nb_operations * 100)
-    return grille, solution
+            progress_bar.set_value(nb / nb_operations * 100)
+        temp[i][j] = "0"
+        cases.remove((i, j))
+        if len(resoud_grille(temp, limit=2)) == 1:
+            g = __genere_grille(temp, taille, nb + 1, nb_operations, cases, progress_bar)
+            if g is not None:
+                return g
+        temp[i][j] = grille[i][j]
+        cases.append((i, j))
+    return None
