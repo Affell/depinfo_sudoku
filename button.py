@@ -4,25 +4,25 @@ import pygame
 class Button:
     def __init__(
         self,
-        x,
-        y,
-        window,
-        width,
-        height,
-        fontColor,
-        buttonText="Button",
-        fontSize=40,
-        onclickFunction=None,
-        onePress=False,
-        image=None,
-        imageOffset=(0, 0),
-        textOffset=(0, 0),
+        x, # Position du bouton en abscisse
+        y, # Position du bouton en ordonnée 
+        window, # Paramètre spécifiant la surface d'affichage
+        width, # Largeur du bouton
+        height, # Hauteur du boutton
+        fontColor, # Couleur de la police d'écriture
+        buttonText="Button", # Texte affiché sur le bouton
+        fontSize=40, # Taille de la police d'écriture
+        onclickFunction=None, # Fonction lancée à l'appui du bouton
+        onePress=False, # Paramètre vérifiant si le bouton est pressé
+        image=None, # Paramètre permettant d'ajouter un image en fond
+        imageOffset=(0, 0), # Décalage de l'image
+        textOffset=(0, 0), # Décalage du texte
         fillColors={
             "normal": "#ffffff",
             "hover": "#666666",
             "pressed": "#333333",
-        },
-        borderRadius=0,
+        }, # Paramètres spécifiant les différentes couleurs du bouton
+        borderRadius=0 # Paramètre permettant d'arrondir les bords du bouton
     ):
         self.x = x
         self.y = y
@@ -33,19 +33,18 @@ class Button:
         self.fontSize = fontSize
         self.onclickFunction = onclickFunction
         self.onePress = onePress
-        self.alreadyPressed = False
+        self.alreadyPressed = False # Paramètre vérifiant si le bouton est déjà pressé
         self.fillColors = fillColors
         self.borderRadius = borderRadius
-        self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.buttonSurface = window.subsurface(self.buttonRect)
-
-        self.font = pygame.font.SysFont("Arial", self.fontSize)
+        self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)  # Rectangle pygame correspondant à ce bouton
+        self.buttonSurface = window.subsurface(self.buttonRect) # Paramètre spécifiant la surface d'affichage
+        self.font = pygame.font.SysFont("Arial", self.fontSize) # Paramètre spécifiant la police d'écriture 
         self.fontColor = fontColor
         self.image = pygame.image.load(image) if image is not None else None
         self.imageOffset = imageOffset
         self.textOffset = textOffset
 
-    def process(self):
+    def process(self): # Fonction qui permet de créer le bouton 
         mousePos = pygame.mouse.get_pos()
         color = "normal"
         if self.buttonRect.collidepoint(mousePos):
