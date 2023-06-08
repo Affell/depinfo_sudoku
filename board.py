@@ -17,9 +17,9 @@ class Board:
         noteMode,  # Paramètre vérifiant si le mode note est activé
         errors: int,  # Compteur d'erreurs
         solution: np.ndarray,  # Matrice contenant la solution de la grille
-        elapsed_time: int = 0,
-        play=True,
-        font="Source Sans Pro"
+        elapsed_time: int = 0, # Temps écoulé depuis le lancement du code
+        play=True, # ??
+        font="Source Sans Pro" # Police d'écriture
     ):
         self.active = True  # Si cet objet board est actif, il va être affiché à l'écran
         self.pause = False  # Mode pause pour arrêter le timer
@@ -66,10 +66,10 @@ class Board:
         self.font = font
         self.create_buttons(elapsed_time)
 
-    def is_running(self):
+    def is_running(self): # Indique si une partie est en cours ou non
         return self.play and self.active and not self.pause
 
-    def draw_board(self):
+    def draw_board(self): # Dessine le plateau de jeu
         for i in range(self.size):
             for j in range(self.size):
                 self.tiles[i][j].draw()
@@ -119,14 +119,14 @@ class Board:
                 self.back_menu.process()
                 self.new_game.process()
 
-    def get_tile(self, x, y) -> Tile:
+    def get_tile(self, x, y) -> Tile: # Renvoie un objet Tile en fonction de ses coordonnées 
         x -= self.offset[0]
         y -= self.offset[1]
         if 0 <= x < self.board_size and 0 <= y < self.board_size:
             return self.tiles[y // self.cell_size][x // self.cell_size]
         return None
 
-    def select_tile(self, tile: Tile):
+    def select_tile(self, tile: Tile): # Permet de sélectionner une case spécifique
         pos = tile.get_pos()
         for i in range(self.size):
             for j in range(self.size):
@@ -147,7 +147,7 @@ class Board:
         tile.selected = True
         self.current_tile = tile
 
-    def move_tile(self, event):
+    def move_tile(self, event): # Permet de sélectionner des cases avec les flèches directionnelles 
         if self.current_tile is None:
             return
         x, y = self.current_tile.get_pos()
@@ -162,7 +162,7 @@ class Board:
 
         self.select_tile(self.tiles[x][y])
 
-    def enter_char(self, char: str):
+    def enter_char(self, char: str): # Permet de saisir un caractère dans la case sélectionnée
         if self.is_running():
             if char not in algorithme.get_allowed_characters(self.size):
                 return
@@ -187,7 +187,7 @@ class Board:
                             self.select_tile(self.tiles[i][j])
                         break
 
-    def save(self):
+    def save(self): # Permet de sauvegarder la partie en cours
         with open(f"./grids/{self.name}.sudoku", "w") as f:
             f.writelines(
                 [",".join([e for e in line]) + "\n" for line in self.init_board]
@@ -206,7 +206,7 @@ class Board:
             )
             f.write(f"TIMER:{self.timer_button.elapsed_time}\n")
 
-    def create_buttons(self, elapsed_time):
+    def create_buttons(self, elapsed_time): # Permet de créer les boutons sur le plateau de jeu
         def on_click():
             self.noteMode = not self.noteMode
 
@@ -268,7 +268,7 @@ class Board:
             onclickFunction=pause_f
         )
 
-    def popup(self, message):
+    def popup(self, message): # Affiche des messages contextuels 
         self.pause = True
 
         gray_surface = pygame.Surface(

@@ -29,11 +29,10 @@ difficulties = {
 }
 
 
-def list_grids() -> list[str]:
+def list_grids() -> list[str]: # Renvoie les noms des fichiers présents dans le répertoire
     return [file[:-7] for file in os.listdir("./grids") if file.endswith(".sudoku")]
 
-
-def menu_load_grid(name, screen):
+def menu_load_grid(name, screen): # Crée le menu de chargement de grille
     grid, progress, notes, noteMode, errors, elapsed_time = algorithme.lecture_grille(name)
     if algorithme.grille_valide(grid):
         solution = algorithme.resoud_grille(grid, 1)
@@ -47,8 +46,7 @@ def menu_load_grid(name, screen):
     else:
         print(f'La grille "{name}" est invalide')
 
-
-def menu_generate_grid(name, size, difficulty, screen, menu):
+def menu_generate_grid(name, size, difficulty, screen, menu): # Crée le menu de génération de grille
     if len(name.strip()) == 0:
         print("Nom de grille invalide")
         return
@@ -73,7 +71,7 @@ def menu_generate_grid(name, size, difficulty, screen, menu):
     else:
         print(f'La grille "{name}" existe déjà')
 
-def menu_solve_grid(name, screen):
+def menu_solve_grid(name, screen):  # Crée le menu de résolution de grilles
     grid, _, _, _, _, _ = algorithme.lecture_grille(name)
     if algorithme.grille_valide(grid):
         solution = algorithme.resoud_grille(grid, 1)
@@ -87,7 +85,7 @@ def menu_solve_grid(name, screen):
     else:
         print(f'La grille "{name}" est invalide')
 
-def build_menu(screen) -> tuple[pygame_menu.Menu]:
+def build_menu(screen) -> tuple[pygame_menu.Menu]: # Construit les différents menus
     menu = pygame_menu.Menu(
         "Sudoku", 1280, 720, theme=pygame_menu.themes.THEME_DARK, columns=2, rows=3
     )
@@ -132,8 +130,7 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:
 
     return menu, load_menu, generate_menu, solve_menu
 
-
-def update_menu_grids(screen, load_menu, solve_menu):
+def update_menu_grids(screen, load_menu, solve_menu): # Mets à jour les différents menus
     load_menu.clear(False)
     solve_menu.clear(False)
     for grid in list_grids():
@@ -144,7 +141,7 @@ def update_menu_grids(screen, load_menu, solve_menu):
             grid, lambda name : menu_solve_grid(name, screen), grid
         )
 
-def game_loop():
+def game_loop(): # Boucle du jeu
 
     global board
     pygame.init()
