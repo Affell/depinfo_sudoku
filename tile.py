@@ -12,7 +12,7 @@ class Tile:
         self.valid = valid  # Paramètre vérifiant si la saise du joueur est valide
         self.window = window  # Paramètre spécifiant la surface d'affichage
         self.size = size  # Taille de la case
-        self.bloc_size = bloc_size  # Taille des sections de la grille
+        self.bloc_size = bloc_size  # Taille des régions de la grille
         self.rect = pygame.Rect(y, x, self.size, self.size)  # Rectangle pygame correspondant à cette case
         self.background_color = "white"  # Couleur du fond
         self.selected = False  # Paramètre vérifiant si la case est saisie ou non
@@ -51,5 +51,5 @@ class Tile:
                 text = font.render(self.notes[i], True, (0, 0, 0))
                 self.window.blit(text, text.get_rect(center=pos))
 
-    def get_pos(self):  # Renvoie lq position de la case
+    def get_pos(self):  # Renvoie la position de la case
         return self.x // self.size, self.y // self.size
