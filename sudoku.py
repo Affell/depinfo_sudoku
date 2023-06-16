@@ -47,6 +47,7 @@ def menu_load_grid(name, screen):  # Crée le menu de chargement de grille
         print(f'La grille "{name}" est invalide')
 
 def menu_generate_grid(name, size, difficulty, screen, menu):  # Crée le menu de génération de grille
+    name = secure_filename(name)
     if len(name.strip()) == 0:
         print("Nom de grille invalide")
         return
@@ -202,6 +203,19 @@ def game_loop():  # Boucle du jeu
 
     pygame.quit()
 
+def secure_filename(filename: str) -> bool:
+    return filename \
+        .replace("/", "") \
+        .replace("\\", "") \
+        .replace(" ", "_") \
+        .replace(":", "") \
+        .replace("*", "") \
+        .replace("?", "") \
+        .replace("\"", "") \
+        .replace("<", "") \
+        .replace(">", "") \
+        .replace("|", "") \
+        .replace("\0", "")
 
 if __name__ == "__main__":
     os.makedirs("grids", exist_ok=True)
