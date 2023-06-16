@@ -204,4 +204,5 @@ def game_loop():  # Boucle du jeu
 
 
 if __name__ == "__main__":
+    os.makedirs("grids", exist_ok=True)
     game_loop()
