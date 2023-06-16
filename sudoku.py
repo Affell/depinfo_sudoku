@@ -133,13 +133,18 @@ def build_menu(screen) -> tuple[pygame_menu.Menu]:  # Construit les différents 
 def update_menu_grids(screen, load_menu, solve_menu):  # Mets à jour les différents menus
     load_menu.clear(False)
     solve_menu.clear(False)
-    for grid in list_grids():
-        load_menu.add.button(
-            grid, lambda name: menu_load_grid(name, screen), grid
-        )
-        solve_menu.add.button(
-            grid, lambda name : menu_solve_grid(name, screen), grid
-        )
+    liste = list_grids()
+    if len(liste) == 0:
+        load_menu.add.label("Vous n'avez pas de grille enregistrée")
+        solve_menu.add.label("Vous n'avez pas de grille enregistrée")
+    else:
+        for grid in liste:
+            load_menu.add.button(
+                grid, lambda name: menu_load_grid(name, screen), grid
+            )
+            solve_menu.add.button(
+                grid, lambda name : menu_solve_grid(name, screen), grid
+            )
 
 def game_loop():  # Boucle du jeu
 
